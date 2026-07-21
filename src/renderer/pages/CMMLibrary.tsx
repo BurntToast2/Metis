@@ -9,7 +9,11 @@ export function CMMLibrary() {
 
   useEffect(() => {
     window.api.getAllCMMs()
-      .then(setCmms)
+      .then((data) => {
+        console.log('CMMs received:', data);
+        setCmms(data);
+      })
+      .catch((err) => console.error('getAllCMMs failed:', err))
       .finally(() => setIsLoading(false));
   }, []);
 

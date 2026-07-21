@@ -1,10 +1,10 @@
 export interface CMMRecord {
-  id: string;
-  name: string;
-  description: string;
-  manufacturer?: string;
-  filePath: string;       // path to the original PDF
-  thumbnailPath?: string; // path to generated cover image 
-  createdAt: string;
-  updatedAt: string;
+  id: number;
+  title: string;
+  cmmNumber: string | null;
+  manufacturer: string | null;
+  revision: string | null;
+  revisionDate: Date | null;
+  filePath: string | null;
+  uploadedAt: Date | null;
 }

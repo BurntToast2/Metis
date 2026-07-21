@@ -1,6 +1,8 @@
+import 'dotenv/config';
 import { app, BrowserWindow } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
+import { registerCMMHandlers } from './ipc/cmm';
 
 if (started) {
   app.quit();
@@ -8,8 +10,8 @@ if (started) {
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1920,
+    height: 1080,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
@@ -26,7 +28,13 @@ const createWindow = () => {
   mainWindow.webContents.openDevTools();
 };
 
-app.on('ready', createWindow);
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+// Some APIs can only be used after this event occurs.
+app.on('ready', () => {
+  registerCMMHandlers();
+  createWindow();
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
