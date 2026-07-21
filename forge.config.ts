@@ -22,12 +22,13 @@ const config: ForgeConfig = {
     new VitePlugin({
       build: [
         {
-          entry: 'src/main/index.ts',
+          // `entry` is just an alias for `build.lib.entry` in the corresponding file of `config`.
+          entry: 'src/main/main.ts',
           config: 'vite.main.config.ts',
           target: 'main',
         },
         {
-          entry: 'src/preload/index.ts',
+          entry: 'src/preload/preload.ts',
           config: 'vite.preload.config.ts',
           target: 'preload',
         },
