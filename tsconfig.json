@@ -8,9 +8,9 @@
     "noImplicitAny": true,
     "sourceMap": true,
     "outDir": "dist",
-    "rootDir": "resource",
+    "rootDir": "src",
     "moduleResolution": "bundler",
     "resolveJsonModule": true
   },
-  "include": ["resource", "forge.env.d.ts"]
+  "include": ["src", "forge.env.d.ts"]
 }
