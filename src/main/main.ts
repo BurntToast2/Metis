@@ -18,7 +18,9 @@ const createWindow = () => {
     height: 1080,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
+      sandbox: false, 
     },
+    
   });
 
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {

@@ -21,8 +21,27 @@ export function registerCmmAssetSchemeAsPrivileged() {
 export function registerCmmAssetProtocolHandler() {
   protocol.handle('cmm-asset', async (request) => {
     const url = new URL(request.url);
+    const pathname = url.pathname.replace(/^\//, ''); // strip leading slash
 
-    const [idSegment, assetName] = url.pathname.replace(/^\//, '').split('/');
+    // NEW: cmm-asset://asset/preview/<encoded absolute path>
+    // Used only for previewing a freshly-selected file before it's been
+    // saved as a CMM (i.e. before it has an id). The path comes from
+    // webUtils.getPathForFile on a real, user-selected File object — not
+    // from arbitrary renderer-supplied strings joined onto a directory.
+    if (pathname.startsWith('preview/')) {
+      const encodedPath = pathname.slice('preview/'.length);
+      const filePath = decodeURIComponent(encodedPath);
+
+      try {
+        return await net.fetch(pathToFileURL(filePath).toString());
+      } catch (err) {
+        console.error(`cmm-asset: failed to preview ${filePath}`, err);
+        return new Response('Asset not found', { status: 404 });
+      }
+    }
+
+    // --- existing id-based logic below, unchanged ---
+    const [idSegment, assetName] = pathname.split('/');
     const id = Number(idSegment);
 
     if (!Number.isInteger(id) || id <= 0) {

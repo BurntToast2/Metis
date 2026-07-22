@@ -1,0 +1,119 @@
+.extract-step {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 32px;
+  gap: 20px;
+  background: linear-gradient(160deg, #f6f3ec 0%, #eef0f4 55%, #e7eaf1 100%);
+}
+
+.extract-step__topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  border: 1px solid #e3e6ec;
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(12, 31, 63, 0.06);
+  padding: 14px 20px;
+  flex-shrink: 0;
+}
+
+.extract-step__title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #0c1f3f;
+}
+
+.extract-step__back {
+  background: none;
+  border: none;
+  font-size: 22px;
+  line-height: 1;
+  color: #5a6472;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.extract-step__back:hover {
+  background: #f2f4f7;
+  color: #0c1f3f;
+}
+
+.extract-step__continue {
+  border: none;
+  border-radius: 8px;
+  background: #c5a046;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 22px;
+  cursor: pointer;
+}
+
+.extract-step__continue:disabled {
+  background: #e3e6ec;
+  color: #9aa3b2;
+  cursor: not-allowed;
+}
+
+.extract-step__body {
+  flex: 1;
+  display: flex;
+  gap: 20px;
+  min-height: 0;
+}
+
+.extract-step__viewer {
+  flex: 1;
+  background: #ffffff;
+  border: 1px solid #e3e6ec;
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(12, 31, 63, 0.06);
+  overflow: hidden;
+}
+
+.extract-step__pdf {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.extract-step__sections {
+  width: 300px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.extract-step__section {
+  border: 2px solid transparent;
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.extract-step__section--selected {
+  border-color: #0c1f3f;
+}
+
+.extract-step__check {
+  font-size: 14px;
+  flex-shrink: 0;
+}

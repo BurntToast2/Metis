@@ -1,6 +1,9 @@
 import { contextBridge, ipcRenderer, webUtils } from 'electron';
+import { pathToFileURL } from 'url';
 import type { CMMRecord } from '../shared/types/cmm';
 
+
+console.log('preload loaded, pathToFileURL:', typeof pathToFileURL);
 contextBridge.exposeInMainWorld('api', {
   getAllCMMs: (): Promise<CMMRecord[]> => ipcRenderer.invoke('get-all-cmms'),
 
@@ -24,4 +27,10 @@ contextBridge.exposeInMainWorld('api', {
   // resolve one, and it only works from the preload/main side, not the
   // renderer directly — hence exposing it here.
   getPathForFile: (file: File): string => webUtils.getPathForFile(file),
+
+  // Converts an absolute filesystem path into a proper file:// URL, handling
+  // Windows drive letters/backslashes/spaces correctly. Needed to load a
+  // local PDF into an <embed>/<iframe> for the section-picker preview.
+  toFileUrl: (filePath: string): string =>
+  `cmm-asset://asset/preview/${encodeURIComponent(filePath)}`,
 });

@@ -16,6 +16,7 @@ declare global {
       deleteCMM: (id: number) => Promise<{ success: boolean }>;
       getCmmFolderPath: (id: number) => Promise<string>;
       getPathForFile: (file: File) => string;
+      toFileUrl: (path: string) => string;
     };
   }
 }
