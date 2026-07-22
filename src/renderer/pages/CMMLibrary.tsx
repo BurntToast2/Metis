@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { CMMRecord } from '../../shared/types/cmm';
 import { CMMCard } from '../components/CMMCard';
+import './CMMLibrary.css';
 
 export function CMMLibrary() {
   const [cmms, setCmms] = useState<CMMRecord[]>([]);
@@ -9,15 +11,21 @@ export function CMMLibrary() {
 
   useEffect(() => {
     window.api.getAllCMMs()
-      .then((data) => {
-        console.log('CMMs received:', data);
-        setCmms(data);
-      })
+      .then(setCmms)
       .catch((err) => console.error('getAllCMMs failed:', err))
       .finally(() => setIsLoading(false));
+    window.api.getAllCMMs()
+  .then((data) => {
+    console.log(typeof data[0]?.uploadedAt, data[0]?.uploadedAt instanceof Date, data[0]?.uploadedAt);
+    setCmms(data);
+  })
   }, []);
 
+  
+
   const filteredCMMs = cmms;
+  const twoMonthsAgo = new Date();
+  twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
 
   return (
     <div className="cmm-library">
@@ -33,9 +41,21 @@ export function CMMLibrary() {
 
       <div className="cmm-library__grid">
         {isLoading ? (
-          <p>Loading...</p>
+          <p className="cmm-library__loading">Loading...</p>
         ) : (
-          filteredCMMs.map((cmm) => <CMMCard key={cmm.id} cmm={cmm} />)
+          filteredCMMs.map((cmm, i) => {
+            const isStale = cmm.uploadedAt !== null && new Date(cmm.uploadedAt) < twoMonthsAgo;
+            return (
+              <motion.div
+                key={cmm.id}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 18, delay: i * 0.05 }}
+              >
+                <CMMCard cmm={cmm} stale={isStale} />
+              </motion.div>
+            );
+          })
         )}
       </div>
     </div>

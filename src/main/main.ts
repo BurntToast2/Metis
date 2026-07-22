@@ -10,6 +10,7 @@ if (started) {
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
+    autoHideMenuBar: true,
     width: 1920,
     height: 1080,
     webPreferences: {
@@ -26,7 +27,10 @@ const createWindow = () => {
   }
 
   mainWindow.webContents.openDevTools();
+  mainWindow.maximize();
+  mainWindow.show();
 };
+
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
