@@ -51,13 +51,14 @@ export function ExtractStep({ file, filePath, onBack, onContinue }: ExtractStepP
     <div className="extract-step">
       <div className="extract-step__topbar">
         <div className="extract-step__title">
-          <button className="extract-step__back" onClick={onBack} aria-label="Back">
+          <button className="extract-step__back" type="button" onClick={onBack} aria-label="Back">
             &lsaquo;
           </button>
           <span>{file.name}</span>
         </div>
         <motion.button
           className="extract-step__continue"
+          type="button"
           disabled={selected.size === 0}
           onClick={() => onContinue(Array.from(selected))}
           whileHover={selected.size > 0 ? { y: -2 } : {}}

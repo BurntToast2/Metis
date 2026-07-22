@@ -4,6 +4,7 @@ import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import { registerCMMHandlers } from './ipc/cmm';
 import { registerCmmAssetSchemeAsPrivileged, registerCmmAssetProtocolHandler } from './storage/CMMProtocol';
+import { registerCmmProcessingHandlers } from './ipc/cmmProcessing'; 
 
 if (started) {
   app.quit();
@@ -40,6 +41,7 @@ const createWindow = () => {
 app.on('ready', () => {
   registerCmmAssetProtocolHandler();
   registerCMMHandlers();
+  registerCmmProcessingHandlers(); 
   createWindow();
 });
 

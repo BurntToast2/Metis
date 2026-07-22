@@ -4,7 +4,14 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   build: {
     rollupOptions: {
-      external: ['pg'],
+      external: [
+        'pg',
+        '@napi-rs/canvas',
+        'pdfjs-dist',
+        'url',
+        'path',
+        'fs',
+      ],
     },
   },
 });

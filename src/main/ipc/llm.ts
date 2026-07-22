@@ -1,0 +1,46 @@
+const LLM_API_URL = 'https://api.deepseek.com/chat/completions';
+const LLM_MODEL = 'deepseek-v4-flash'; 
+
+export async function getStructuredCompletion<T>(
+  systemPrompt: string,
+  userPrompt: string,
+): Promise<T> {
+  const apiKey = process.env.DEEPSEEK_API_KEY;
+  if (!apiKey) {
+    throw new Error('DEEPSEEK_API_KEY is not set in environment');
+  }
+
+  const response = await fetch(LLM_API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: LLM_MODEL,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      response_format: { type: 'json_object' },
+      temperature: 0.2,
+    }),
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`LLM request failed (${response.status}): ${errText}`);
+  }
+
+  const data = await response.json();
+  const content = data.choices?.[0]?.message?.content;
+  if (!content) {
+    throw new Error('LLM response missing content');
+  }
+
+  try {
+    return JSON.parse(content) as T;
+  } catch {
+    throw new Error(`LLM returned invalid JSON: ${content}`);
+  }
+}

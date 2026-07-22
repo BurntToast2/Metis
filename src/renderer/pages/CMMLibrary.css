@@ -50,14 +50,35 @@
   min-height: 280px;
   box-shadow: 0 1px 2px rgba(12, 31, 63, 0.06);
   overflow: hidden;
+  position: relative; 
+}
+
+.cmm-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #f6e6c4 0%, #eef1f6 55%, #dbe2ee 100%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none; 
+  z-index: 0;
+}
+
+.cmm-card:hover::before {
+  opacity: 1;
+}
+
+.cmm-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .cmm-card__cover {
   width: 100%;
-  height: 160px;
+  min-height: 160px;
   object-fit: cover;
   object-position: top;
-  border: 1px solid #e3e6ec;
+  border: 1px solid #0c1f3f;
   border-radius: 2px;
   margin-top: auto;
 }

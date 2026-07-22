@@ -17,6 +17,10 @@ declare global {
       getCmmFolderPath: (id: number) => Promise<string>;
       getPathForFile: (file: File) => string;
       toFileUrl: (path: string) => string;
+      processNewCmm: (
+        filePath: string,
+        selectedSectionIds: string[],
+      ) => Promise<{ id: number }>;
     };
   }
 }

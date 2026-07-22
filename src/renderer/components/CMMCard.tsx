@@ -16,10 +16,14 @@ export function CMMCard({ cmm, stale, onClick }: CMMCardProps) {
       transition={{ type: 'spring', stiffness: 400, damping: 20 }}
     >
       <h3 className="cmm-card__name">{cmm.title}</h3>
-      {cmm.cmmNumber && <p className="cmm-card__number">{cmm.cmmNumber}</p>}
+      {cmm.cmmNumber && <p className="cmm-card__number">CMM {cmm.cmmNumber}</p>}
       {cmm.manufacturer && <p className="cmm-card__manufacturer">{cmm.manufacturer}</p>}
-      {cmm.revision && <p className="cmm-card__revision">{cmm.revision}</p>}
-      <img src={`cmm-asset://asset/${cmm.id}/cover.png`} alt={cmm.title} />
+      {cmm.revision && <p className="cmm-card__revision">Rev {cmm.revision}</p>}
+      <img
+        src={`cmm-asset://asset/${cmm.id}/cover.png`}
+        alt={cmm.title}
+        className="cmm-card__cover"
+      />
     </motion.div>
   );
 }

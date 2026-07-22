@@ -14,3 +14,15 @@ export function getCmmPdfPath(id: number): string {
 export function getCmmCoverPath(id: number): string {
   return path.join(getCmmFolderPath(id), 'cover.png');
 }
+
+export function getCmmSummaryPath(id: number): string {
+  return path.join(getCmmFolderPath(id), 'summary.json');
+}
+
+export function getCmmSectionsPath(id: number): string {
+  return path.join(getCmmFolderPath(id), 'sections.json');
+}
+
+export function getCmmRawTextPath(id: number): string {
+  return path.join(getCmmFolderPath(id), 'raw-text.json');
+}
