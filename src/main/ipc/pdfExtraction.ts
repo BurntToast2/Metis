@@ -37,6 +37,42 @@ export async function extractPdfTextRange(
   return pages;
 }
 
+export async function extractPdfPageSnippets(
+  filePath: string,
+  startPage: number,
+  endPage: number,
+): Promise<PageText[]> {
+  const doc = await pdfjsLib.getDocument({ url: filePath }).promise;
+  const lastPage = Math.min(endPage, doc.numPages);
+
+  const pages: PageText[] = [];
+
+  for (let pageNum = startPage; pageNum <= lastPage; pageNum++) {
+    const page = await doc.getPage(pageNum);
+    const content = await page.getTextContent();
+
+    const text = content.items
+      .map((item) => ('str' in (item as TextItem) ? (item as TextItem).str : ''))
+      .join(' ');
+
+    const snippet = text
+      .trim()
+      .split(/\s+/)
+      .slice(0, 40)
+      .join(' ');
+
+    pages.push({ page: pageNum, text: snippet });
+    page.cleanup();
+  }
+
+  return pages;
+}
+
+export async function getPdfPageCount(filePath: string): Promise<number> {
+  const doc = await pdfjsLib.getDocument({ url: filePath }).promise;
+  return doc.numPages;
+}
+
 /**
  * Renders the first page of a PDF to a PNG buffer, for use as a cover image.
  * `scale` controls resolution — 2 gives a reasonably crisp thumbnail without
