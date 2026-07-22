@@ -1,0 +1,68 @@
+.upload-step {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 32px;
+  box-sizing: border-box;
+}
+
+.upload-step__zone {
+  width: 100%;
+  max-width: 900px;
+  height: 560px;
+  border: 2px dashed transparent;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #f6e6c4 0%, #eef1f6 55%, #dbe2ee 100%);
+  box-shadow: 0 2px 8px rgba(12, 31, 63, 0.06), 0 12px 32px rgba(12, 31, 63, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.25s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.upload-step__zone:hover {
+  background: linear-gradient(135deg, #f8e6bc 0%, #ecf0f6 55%, #d4dcec 100%);
+  box-shadow: 0 4px 12px rgba(12, 31, 63, 0.08), 0 16px 40px rgba(12, 31, 63, 0.1);
+}
+
+.upload-step__zone--dragging {
+  border-color: #c5a046;
+  background: linear-gradient(135deg, #fbdfa0 0%, #f6ecce 100%);
+  box-shadow: 0 4px 16px rgba(197, 160, 70, 0.22), 0 20px 48px rgba(197, 160, 70, 0.16);
+}
+
+.upload-step__box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 40px 56px;
+  pointer-events: none;
+}
+
+.upload-step__label {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: #0c1f3f;
+}
+
+.upload-step__hint {
+  margin: -8px 0 0;
+  font-size: 13px;
+  color: #9aa3b2;
+}
+
+.upload-step__error {
+  margin-top: 16px;
+  color: #c2564a;
+  font-size: 14px;
+}
+
+.upload-step__input {
+  display: none;
+}

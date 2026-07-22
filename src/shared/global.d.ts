@@ -6,6 +6,16 @@ declare global {
   interface Window {
     api: {
       getAllCMMs: () => Promise<CMMRecord[]>;
+      createCMM: (data: {
+        title: string;
+        cmmNumber?: string | null;
+        manufacturer?: string | null;
+        revision?: string | null;
+        revisionDate?: Date | null;
+      }) => Promise<CMMRecord>;
+      deleteCMM: (id: number) => Promise<{ success: boolean }>;
+      getCmmFolderPath: (id: number) => Promise<string>;
+      getPathForFile: (file: File) => string;
     };
   }
 }
