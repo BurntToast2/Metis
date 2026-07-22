@@ -31,4 +31,8 @@ contextBridge.exposeInMainWorld('api', {
     selectedSectionIds: string[],
   ): Promise<{ id: number }> =>
     ipcRenderer.invoke('process-new-cmm', filePath, selectedSectionIds),
+
+  getCmmSections: (id: number) => ipcRenderer.invoke('get-cmm-sections', id),
+  getCmmSummary: (id: number) => ipcRenderer.invoke('get-cmm-summary', id),
+  ensureCmmSectionPreviews: (id: number) => ipcRenderer.invoke('ensure-cmm-section-previews', id),
 });

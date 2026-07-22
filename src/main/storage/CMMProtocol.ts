@@ -1,6 +1,6 @@
 import { protocol, net } from 'electron';
 import { pathToFileURL } from 'url';
-import { getCmmPdfPath, getCmmCoverPath } from './CMMPaths';
+import { getCmmPdfPath, getCmmCoverPath, getCmmSectionPreviewPath } from './CMMPaths';
 
 
 export function registerCmmAssetSchemeAsPrivileged() {
@@ -35,6 +35,23 @@ export function registerCmmAssetProtocolHandler() {
       }
     }
 
+    // NEW: cmm-asset://asset/<id>/sections/<sectionId>.png
+    // Section preview thumbnails, generated on-demand by
+    // ensureCmmSectionPreviews and cached to disk under the CMM's folder.
+    const sectionMatch = pathname.match(/^(\d+)\/sections\/([\w-]+)\.png$/);
+    if (sectionMatch) {
+      const id = Number(sectionMatch[1]);
+      const sectionId = sectionMatch[2];
+      const filePath = getCmmSectionPreviewPath(id, sectionId);
+      try {
+        return await net.fetch(pathToFileURL(filePath).toString());
+      } catch (err) {
+        console.error(`cmm-asset: failed to read section preview ${filePath}`, err);
+        return new Response('Asset not found', { status: 404 });
+      }
+    }
+
+    // --- existing id-based logic below, unchanged ---
     const [idSegment, assetName] = pathname.split('/');
     const id = Number(idSegment);
 

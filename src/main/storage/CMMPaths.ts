@@ -26,3 +26,11 @@ export function getCmmSectionsPath(id: number): string {
 export function getCmmRawTextPath(id: number): string {
   return path.join(getCmmFolderPath(id), 'raw-text.json');
 }
+
+export function getCmmSectionsFolderPath(id: number): string {
+  return path.join(getCmmFolderPath(id), 'sections');
+}
+
+export function getCmmSectionPreviewPath(id: number, sectionId: string): string {
+  return path.join(getCmmSectionsFolderPath(id), `${sectionId}.png`);
+}

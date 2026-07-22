@@ -3,8 +3,9 @@ import { app, BrowserWindow } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import { registerCMMHandlers } from './ipc/cmm';
-import { registerCmmAssetSchemeAsPrivileged, registerCmmAssetProtocolHandler } from './storage/CMMProtocol';
-import { registerCmmProcessingHandlers } from './ipc/cmmProcessing'; 
+import { registerCmmAssetSchemeAsPrivileged, registerCmmAssetProtocolHandler, } from './storage/CMMProtocol';
+import { registerCmmProcessingHandlers } from './ipc/cmmProcessing'; // was './ipc/cmm-Processing'
+import { registerEnsureCmmSectionPreviewsHandler } from './ipc/ensureCMMSectionPreview';
 
 if (started) {
   app.quit();
@@ -42,6 +43,7 @@ app.on('ready', () => {
   registerCmmAssetProtocolHandler();
   registerCMMHandlers();
   registerCmmProcessingHandlers(); 
+  registerEnsureCmmSectionPreviewsHandler();
   createWindow();
 });
 

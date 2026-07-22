@@ -74,16 +74,17 @@ export async function getPdfPageCount(filePath: string): Promise<number> {
 }
 
 /**
- * Renders the first page of a PDF to a PNG buffer, for use as a cover image.
- * `scale` controls resolution — 2 gives a reasonably crisp thumbnail without
- * producing an oversized file for a simple card image.
+ * Renders a given page of a PDF to a PNG buffer, e.g. for cover images or
+ * section preview thumbnails. `scale` controls resolution — 2 gives a
+ * reasonably crisp thumbnail without producing an oversized file.
  */
-export async function renderPdfCoverPng(
+export async function renderPdfPagePng(
   filePath: string,
+  pageNumber: number,
   scale = 2,
 ): Promise<Buffer> {
   const doc = await pdfjsLib.getDocument({ url: filePath }).promise;
-  const page = await doc.getPage(1);
+  const page = await doc.getPage(pageNumber);
   const viewport = page.getViewport({ scale });
 
   const canvas = createCanvas(viewport.width, viewport.height);
@@ -97,4 +98,14 @@ export async function renderPdfCoverPng(
 
   page.cleanup();
   return canvas.toBuffer('image/png');
+}
+
+/**
+ * Renders the first page of a PDF to a PNG buffer, for use as a cover image.
+ */
+export async function renderPdfCoverPng(
+  filePath: string,
+  scale = 2,
+): Promise<Buffer> {
+  return renderPdfPagePng(filePath, 1, scale);
 }

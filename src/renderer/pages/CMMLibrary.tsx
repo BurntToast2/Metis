@@ -4,7 +4,11 @@ import { CMMRecord } from '../../shared/types/cmm';
 import { CMMCard } from '../components/CMMCard';
 import './CMMLibrary.css';
 
-export function CMMLibrary() {
+interface CMMLibraryProps {
+  onSelectCmm: (cmm: CMMRecord) => void;
+}
+
+export function CMMLibrary({ onSelectCmm }: CMMLibraryProps) {
   const [cmms, setCmms] = useState<CMMRecord[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -16,9 +20,15 @@ export function CMMLibrary() {
       .finally(() => setIsLoading(false));
   }, []);
 
-  
+  const query = searchQuery.trim().toLowerCase();
+  const filteredCMMs = query
+    ? cmms.filter((cmm) =>
+        [cmm.title, cmm.cmmNumber, cmm.manufacturer]
+          .filter(Boolean)
+          .some((field) => field!.toLowerCase().includes(query)),
+      )
+    : cmms;
 
-  const filteredCMMs = cmms;
   const twoMonthsAgo = new Date();
   twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
 
@@ -37,6 +47,8 @@ export function CMMLibrary() {
       <div className="cmm-library__grid">
         {isLoading ? (
           <p className="cmm-library__loading">Loading...</p>
+        ) : filteredCMMs.length === 0 ? (
+          <p className="cmm-library__loading">No CMMs match your search.</p>
         ) : (
           filteredCMMs.map((cmm, i) => {
             const isStale = cmm.uploadedAt !== null && new Date(cmm.uploadedAt) < twoMonthsAgo;
@@ -47,7 +59,7 @@ export function CMMLibrary() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 18, delay: i * 0.05 }}
               >
-                <CMMCard cmm={cmm} stale={isStale} />
+                <CMMCard cmm={cmm} stale={isStale} onClick={onSelectCmm} />
               </motion.div>
             );
           })
