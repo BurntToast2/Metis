@@ -19,6 +19,7 @@ export function CMMCard({ cmm, stale, onClick }: CMMCardProps) {
       {cmm.cmmNumber && <p className="cmm-card__number">{cmm.cmmNumber}</p>}
       {cmm.manufacturer && <p className="cmm-card__manufacturer">{cmm.manufacturer}</p>}
       {cmm.revision && <p className="cmm-card__revision">{cmm.revision}</p>}
+      <img src={`cmm-asset://asset/${cmm.id}/cover.png`} alt={cmm.title} />
     </motion.div>
   );
 }

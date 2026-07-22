@@ -14,11 +14,6 @@ export function CMMLibrary() {
       .then(setCmms)
       .catch((err) => console.error('getAllCMMs failed:', err))
       .finally(() => setIsLoading(false));
-    window.api.getAllCMMs()
-  .then((data) => {
-    console.log(typeof data[0]?.uploadedAt, data[0]?.uploadedAt instanceof Date, data[0]?.uploadedAt);
-    setCmms(data);
-  })
   }, []);
 
   
