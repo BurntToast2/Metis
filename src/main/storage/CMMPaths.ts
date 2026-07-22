@@ -1,8 +1,6 @@
 import { app } from 'electron';
 import path from 'path';
 
-// storage/cmms/<id>/cmm.pdf
-// storage/cmms/<id>/cover.png
 const STORAGE_ROOT = () => path.join(app.getPath('userData'), 'storage', 'cmms');
 
 export function getCmmFolderPath(id: number): string {

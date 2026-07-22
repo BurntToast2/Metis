@@ -9,9 +9,6 @@ if (started) {
   app.quit();
 }
 
-// MUST run at module scope, before app.on('ready')/app.whenReady() fires.
-// This is what makes cmm-asset:// behave like a real, secure scheme instead
-// of being silently blocked or half-working (see explanation from earlier).
 registerCmmAssetSchemeAsPrivileged();
 
 const createWindow = () => {
@@ -38,13 +35,7 @@ const createWindow = () => {
 };
 
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 app.on('ready', () => {
-  // Registers the actual cmm-asset:// request handler. Needs to happen after
-  // 'ready' (the session/networking layer needs to exist), and before the
-  // window loads content that might request cmm-asset:// URLs.
   registerCmmAssetProtocolHandler();
   registerCMMHandlers();
   createWindow();

@@ -1,7 +1,8 @@
 .cmm-library {
-  max-width: 1100px;
+  width: 100%;
   margin: 0 auto;
   padding: 48px 32px;
+  box-sizing: border-box;
 }
 
 .cmm-library__header {
@@ -32,9 +33,8 @@
 
 .cmm-library__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 220px));
-  justify-content: start;
-  gap: 28px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 24px;
 }
 
 .cmm-card {
@@ -47,8 +47,19 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  min-height: 180px;
+  min-height: 280px;
   box-shadow: 0 1px 2px rgba(12, 31, 63, 0.06);
+  overflow: hidden;
+}
+
+.cmm-card__cover {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  object-position: top;
+  border: 1px solid #e3e6ec;
+  border-radius: 2px;
+  margin-top: auto;
 }
 
 .cmm-card__name {
