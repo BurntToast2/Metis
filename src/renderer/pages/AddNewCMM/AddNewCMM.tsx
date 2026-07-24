@@ -33,10 +33,6 @@ export function AddNewCMM({ onCmmReady }: AddNewCMMProps) {
     setError(null);
     try {
       const result = await window.api.processNewCmm(filePath as string, selectedSectionIds);
-
-      // ASSUMPTION: no dedicated getCmmById exists yet, so the freshly
-      // created record is found from the full list. Fine at current scale;
-      // worth replacing with a direct lookup if the library ever gets large.
       const allCmms = await window.api.getAllCMMs();
       const cmm = allCmms.find((c) => c.id === result.id);
 

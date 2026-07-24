@@ -96,7 +96,7 @@ export async function extractPdfPageBoundarySnippets(
   filePath: string,
   startPage: number,
   endPage: number,
-  wordsPerEnd = 40,
+  wordsPerEnd = 30,
 ): Promise<PageText[]> {
   const doc = await pdfjsLib.getDocument({ url: filePath, standardFontDataUrl }).promise;
   const lastPage = Math.min(endPage, doc.numPages);
