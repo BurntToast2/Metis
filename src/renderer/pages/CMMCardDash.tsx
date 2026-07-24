@@ -72,12 +72,13 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
           <div className="cmm-card-dash__top">
             <div className="cmm-card-dash__viewer">
               {pdfUrl ? (
-                <embed
-                  key={currentPage}
-                  src={`${pdfUrl}#page=${currentPage}`}
-                  type="application/pdf"
-                  className="cmm-card-dash__viewer-embed"
-                />
+                <div className="cmm-card-dash__viewer">
+                  <img
+                    src={`cmm-asset://asset/${cmm.id}/cover.png`}
+                    alt={cmm.title}
+                    className="cmm-card-dash__viewer-cover"
+                  />
+                </div>
               ) : (
                 <p>No PDF available.</p>
               )}
