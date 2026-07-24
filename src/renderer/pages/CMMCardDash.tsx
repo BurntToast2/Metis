@@ -54,8 +54,6 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
       .catch((err) => console.error('ensureCmmSectionPreviews failed:', err));
   }, [cmm.id]);
 
-  const pdfUrl = `cmm-asset://asset/${cmm.id}/cmm.pdf`;
-
   return (
     <div className="cmm-card-dash">
       <div className="cmm-card-dash__header">
@@ -71,17 +69,11 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
         <>
           <div className="cmm-card-dash__top">
             <div className="cmm-card-dash__viewer">
-              {pdfUrl ? (
-                <div className="cmm-card-dash__viewer">
-                  <img
-                    src={`cmm-asset://asset/${cmm.id}/cover.png`}
-                    alt={cmm.title}
-                    className="cmm-card-dash__viewer-cover"
-                  />
-                </div>
-              ) : (
-                <p>No PDF available.</p>
-              )}
+              <img
+                src={`cmm-asset://asset/${cmm.id}/cover.png`}
+                alt={cmm.title}
+                className="cmm-card-dash__viewer-cover"
+              />
             </div>
 
             <div className="cmm-card-dash__summary">
@@ -123,36 +115,46 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
           </div>
 
           <div className="cmm-card-dash__sections">
-            {sections.map((section, i) => (
-              <motion.div
-                key={section.sectionId}
-                className={`cmm-card-dash__section-card ${
-                  currentPage >= section.startPage && currentPage <= section.endPage
-                    ? 'cmm-card-dash__section-card--active'
-                    : ''
-                }`}
-                onClick={() => setCurrentPage(section.startPage)}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 18, delay: i * 0.05 }}
-              >
-                {previewsReady ? (
-                  <img
-                    src={`cmm-asset://asset/${cmm.id}/sections/${section.sectionId}.png`}
-                    alt={sectionLabel(section.sectionId)}
-                    className="cmm-card-dash__section-preview"
-                  />
-                ) : (
-                  <div className="cmm-card-dash__section-preview--placeholder">
-                    <span>{sectionLabel(section.sectionId).slice(0, 1)}</span>
-                  </div>
-                )}
-                <p className="cmm-card-dash__section-name">{sectionLabel(section.sectionId)}</p>
-                <p className="cmm-card-dash__section-pages">
-                  pp. {section.startPage}–{section.endPage}
-                </p>
-              </motion.div>
-            ))}
+            {sections.map((section, i) => {
+              const isActive = currentPage >= section.startPage && currentPage <= section.endPage;
+
+              return (
+                <motion.div
+                  key={section.sectionId}
+                  className={`cmm-card-dash__section-card ${
+                    isActive ? 'cmm-card-dash__section-card--active' : ''
+                  }`}
+                  onClick={() => setCurrentPage(section.startPage)}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 18, delay: i * 0.01 }}
+                  whileHover={{
+                    y: -24,
+                    scale: 1.04,
+                    zIndex: 10,
+                    boxShadow: '0 16px 28px rgba(12, 31, 63, 0.22)',
+                    transition: { type: 'spring', stiffness: 350, damping: 20 },
+                  }}
+                  style={{ transformOrigin: 'bottom center' }}
+                >
+                  {previewsReady ? (
+                    <img
+                      src={`cmm-asset://asset/${cmm.id}/sections/${section.sectionId}.png`}
+                      alt={sectionLabel(section.sectionId)}
+                      className="cmm-card-dash__section-preview"
+                    />
+                  ) : (
+                    <div className="cmm-card-dash__section-preview--placeholder">
+                      <span>{sectionLabel(section.sectionId).slice(0, 1)}</span>
+                    </div>
+                  )}
+                  <p className="cmm-card-dash__section-name">{sectionLabel(section.sectionId)}</p>
+                  <p className="cmm-card-dash__section-pages">
+                    pp. {section.startPage}–{section.endPage}
+                  </p>
+                </motion.div>
+              );
+            })}
           </div>
         </>
       )}
