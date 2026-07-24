@@ -1,0 +1,68 @@
+
+.add-cmm-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 64px 32px;
+  text-align: center;
+}
+
+.add-cmm-status__spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #eef0f3;
+  border-top-color: #2563eb;
+  border-radius: 50%;
+}
+
+.add-cmm-status__check {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-cmm-status__title {
+  margin: 0;
+  color: #0c1f3f;
+}
+
+.add-cmm-status__message {
+  color: #5a6472;
+  font-size: 15px;
+  margin: 0;
+}
+
+.add-cmm-status__button {
+  margin-top: 8px;
+  padding: 12px 24px;
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.add-cmm-status__button:hover {
+  background: #1d4ed8;
+}
+
+.add-cmm-status__error {
+  color: #b3261e;
+  background: #fdf0ee;
+  border: 1px solid #f3c8c2;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 16px 32px 0;
+  font-size: 14px;
+}

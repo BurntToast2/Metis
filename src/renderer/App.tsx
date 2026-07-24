@@ -24,7 +24,7 @@ export function App() {
       <Sidebar activePage={activePage} onNavigate={setActivePage} />
       <main className="app-content">
         {activePage === 'library' && <CMMLibrary onSelectCmm={handleSelectCmm} />}
-        {activePage === 'cmm-add' && <AddNewCMM />}
+        {activePage === 'cmm-add' && <AddNewCMM onCmmReady={handleSelectCmm} />}
         {activePage === 'cmm-dash' && selectedCmm && (
           <CMMCardDash cmm={selectedCmm} onBack={handleBackToLibrary} />
         )}
