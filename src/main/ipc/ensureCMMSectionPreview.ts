@@ -14,7 +14,7 @@ export function registerEnsureCmmSectionPreviewsHandler() {
 
     try {
       await access(folderPath);
-      return { generated: false }; // folder already exists, nothing to do
+      return { generated: false }; 
     } catch {
       // folder doesn't exist — generate everything
     }

@@ -3,7 +3,7 @@ import fs from 'fs/promises';
 import { eq } from 'drizzle-orm';
 import {
   extractPdfTextRange,
-  extractPdfPageSnippets,
+  extractPdfPageBoundarySnippets,
   renderPdfCoverPng,
   getPdfPageCount,
 } from './pdfExtraction';
@@ -37,21 +37,7 @@ const KNOWN_SECTION_IDS = [
   'illustrated-parts-list',
 ] as const;
 
-// The LOEP's own entry in its own table — used as a calibration anchor to
-// convert row position into physical PDF page. Filtered out of final ranges.
-const LOEP_SECTION_ID = 'list-of-effective-pages';
-
-// Title pages, transmittal letters, TOC, record-of-revisions, blank pages —
-// anything with no identifiable section header. Filtered out of the final ranges.
 const FALLBACK_SECTION_ID = 'other';
-
-// LOEP tables have been observed running as long as ~20 physical pages, and
-// continuation pages can't be reliably detected from text — they don't
-// always repeat the title or a fixed column header, and formatting varies
-// manual to manual. So instead of trying to detect where the table ends,
-// pull a generously-sized fixed window and let the LLM (which already has
-// to read every row) recognize where the real content begins.
-const LOEP_MAX_PAGES = 25;
 
 interface CmmMetadata {
   title: string;
@@ -68,9 +54,9 @@ interface SectionRange {
   endPage: number;
 }
 
-interface LoepEntry {
+interface PageClassification {
+  page: number;
   sectionId: string;
-  printedPage: string;
 }
 
 function buildMetadataPrompt(pages: PageText[]): {
@@ -95,77 +81,60 @@ Return ONLY a JSON object with this exact shape, no other text:
 }
 
 /**
- * Finds the physical PDF page where the "List of Effective Pages" table
- * starts, using the cheap first-~40-words-per-page snippets we already pull
- * for the whole document — no LLM call needed for this step.
+ * Classifies every physical page of the manual into a top-level chapter,
+ * using only each page's own first/last ~40 words (running headers,
+ * chapter titles, contextual content) rather than parsing any front-matter
+ * table. Front-matter tables listing "effective pages" vary too much
+ * between manufacturers to parse reliably (page-per-row LOEP vs.
+ * task/subtask-per-row LOEC, differing column layouts, etc.) — reading
+ * each page directly sidesteps all of that.
  */
-function findLoepStartPage(snippets: PageText[]): number | null {
-  const match = snippets.find((p) => /list of effective pages/i.test(p.text));
-  return match ? match.page : null;
-}
-
-function buildLoepPrompt(loepPages: PageText[]): {
+function buildPageClassificationPrompt(pages: PageText[]): {
   systemPrompt: string;
   userPrompt: string;
 } {
-  const systemPrompt = `You are reading the "List of Effective Pages" (LOEP) table from an aviation Component Maintenance Manual (CMM), which follows the ATA iSpec 2200 standard.
+  const systemPrompt = `You are reading page excerpts from an aviation Component Maintenance Manual (CMM), which follows the ATA iSpec 2200 standard.
 
-The table lists every page of the manual, in physical top-to-bottom, left-to-right reading order. A repeated "SUBJECT / PAGE / DATE" header (if present) marks a column break within the table — it is NOT a new section and should NOT get its own entry.
+For EACH page given, you are shown the first and last ~40 words of that physical page's text (with "..." marking the gap between them, if the page has more text than that). Use whatever running headers, chapter titles, or contextual content appears to determine which top-level chapter that physical page belongs to.
 
-You may be given several pages of text beyond the actual end of the table — where the manual's real content begins (e.g. an Introduction or Description chapter: narrative prose and body text, not page/date rows). Stop emitting entries the moment you reach that point, even if there is more text below it in what you were given. Only emit entries for genuine table rows; do not fabricate rows for text that isn't part of this table.
+Classify each page into exactly one of these section IDs:
+${KNOWN_SECTION_IDS.join(', ')}, ${FALLBACK_SECTION_ID}
 
-Walk through the table top to bottom and output exactly ONE entry per row, in the exact order the rows are printed. Include every row, even if the manual's own printed page numbers repeat, skip, or look inconsistent — you are recording row order, not validating the printed numbers.
+Use "${FALLBACK_SECTION_ID}" for front matter — title page, transmittal letter, highlights, record of revisions, record of temporary revisions, service bulletin list, any "list of effective pages/content" table, table of contents, list of illustrations, list of tables — or any page that doesn't clearly belong to one of the known chapters.
 
-Classify each row's "Subject" into exactly one of these section IDs, based on the header text AS PRINTED — do NOT infer ATA iSpec chapter numbers:
-${LOEP_SECTION_ID}, ${KNOWN_SECTION_IDS.join(', ')}, ${FALLBACK_SECTION_ID}
+A page with little or no distinguishing text of its own (e.g. a mostly-blank page, or a figure/table with no visible header) belongs to the SAME chapter as the physical page immediately before it — use page order and surrounding context, not just the words on that one page in isolation.
 
-Use "${LOEP_SECTION_ID}" ONLY for the row(s) belonging to the "List of Effective Pages" section itself (i.e. this table's own entry in the list).
-Use "${FALLBACK_SECTION_ID}" for title page, transmittal letter, record of revisions, record of temporary revisions, service bulletin list, table of contents, or anything else with no match among the other IDs.
+Chapters are contiguous — once a chapter has ended and a later chapter has begun, do not classify any subsequent page back into an earlier chapter, even if a sub-heading elsewhere reuses similar wording.
 
-Return ONLY valid JSON in this exact shape, no other text:
+Return ONLY valid JSON in this exact shape, no other text, with exactly one entry per page given, in page order:
 {
-  "entries": [
-    { "sectionId": string, "printedPage": string }
+  "pages": [
+    { "page": number, "sectionId": string }
   ]
 }`;
-  const userPrompt = loepPages.map((p) => `[PDF page ${p.page}]\n${p.text}`).join('\n\n');
+  const userPrompt = pages.map((p) => `[PDF page ${p.page}]\n${p.text}`).join('\n\n');
   return { systemPrompt, userPrompt };
 }
 
 /**
- * The LOEP table lists itself, so we independently know two things about
- * that same page: the physical PDF page it's on (from findLoepStartPage, a
- * plain text search) and the row position it occupies within its own parsed
- * list (from the LLM's row order). The difference is a fixed offset —
- * usually caused by cover pages or scan-inserted blanks that exist in the
- * PDF but were never counted in the manual's own front matter — and it
- * applies uniformly to every row.
+ * Collapses per-page classifications into contiguous section ranges.
+ * Driven entirely by the LLM's page-by-page judgment, not by any table's
+ * printed page labels or row order.
  */
-function computeLoepOffset(entries: LoepEntry[], loepStartPhysicalPage: number): number {
-  const selfIndex = entries.findIndex((e) => e.sectionId === LOEP_SECTION_ID);
-  return selfIndex === -1 ? 0 : loepStartPhysicalPage - (selfIndex + 1);
-}
-
-/**
- * Applies the calibrated offset to every row to get its true physical PDF
- * page, then collapses consecutive same-section rows into ranges. This is
- * driven entirely by row order, not by the manual's own printed page labels
- * — so typos or gaps in the source manual's numbering don't affect it.
- */
-function loepEntriesToPhysicalPages(entries: LoepEntry[], offset: number): SectionRange[] {
+function pageClassificationsToRanges(classifications: PageClassification[]): SectionRange[] {
   const ranges: SectionRange[] = [];
 
-  entries.forEach((entry, i) => {
-    const physicalPage = i + 1 + offset;
+  for (const { page, sectionId } of classifications) {
+    if (sectionId === FALLBACK_SECTION_ID) continue;
     const last = ranges[ranges.length - 1];
-    if (last && last.sectionId === entry.sectionId && physicalPage === last.endPage + 1) {
-      last.endPage = physicalPage;
+    if (last && last.sectionId === sectionId && page === last.endPage + 1) {
+      last.endPage = page;
     } else {
-      ranges.push({ sectionId: entry.sectionId, startPage: physicalPage, endPage: physicalPage });
+      ranges.push({ sectionId, startPage: page, endPage: page });
     }
-  });
+  }
 
-  return ranges.filter((r) => r.sectionId !== FALLBACK_SECTION_ID && r.sectionId !== LOEP_SECTION_ID);
+  return ranges;
 }
 
 export async function processNewCmm(
@@ -174,43 +143,20 @@ export async function processNewCmm(
 ): Promise<{ id: number }> {
   const totalPages = await getPdfPageCount(uploadedFilePath);
 
-  // Cheap first pass over the whole doc (first ~40 words/page, no LLM) just
-  // to locate the LOEP. Everything downstream of finding it is arithmetic —
-  // this is the only page range that goes to an LLM for classification.
-  const allPageSnippets = await extractPdfPageSnippets(uploadedFilePath, 1, totalPages/4);
-  const loepStartPhysicalPage = findLoepStartPage(allPageSnippets);
+  const boundarySnippets = await extractPdfPageBoundarySnippets(uploadedFilePath, 1, totalPages);
+  const { systemPrompt: classifySystem, userPrompt: classifyUser } =
+    buildPageClassificationPrompt(boundarySnippets);
+  const { pages: classifications } = await getStructuredCompletion<{
+    pages: PageClassification[];
+  }>(classifySystem, classifyUser, {
+    maxTokens: Math.max(8000, totalPages * 20),
+  });
 
-  let sectionRanges: SectionRange[] = [];
-
-  if (loepStartPhysicalPage !== null) {
-    const loepEndPage = Math.min(loepStartPhysicalPage + LOEP_MAX_PAGES - 1, totalPages);
-    const loepPages = await extractPdfTextRange(uploadedFilePath, loepStartPhysicalPage, loepEndPage);
-    const { systemPrompt: loepSystem, userPrompt: loepUser } = buildLoepPrompt(loepPages);
-    const { entries } = await getStructuredCompletion<{ entries: LoepEntry[] }>(loepSystem, loepUser, {
-      maxTokens: Math.max(8000, totalPages * 20),
-    });
-
-    const offset = computeLoepOffset(entries, loepStartPhysicalPage);
-    sectionRanges = loepEntriesToPhysicalPages(entries, offset);
-
-    // Sanity check: the last row's computed physical page should land
-    // exactly on the document's real page count. If it doesn't, there's a
-    // second unexplained gap somewhere and this mapping shouldn't be
-    // trusted blindly.
-    const lastComputedPage = entries.length + offset;
-    if (lastComputedPage !== totalPages) {
-      console.warn(
-        `LOEP mapping sanity check failed: computed last page ${lastComputedPage}, actual page count ${totalPages}. Section ranges may be unreliable.`,
-      );
-    }
-  } else {
-    console.warn('Could not locate "List of Effective Pages" in this CMM — section mapping skipped.');
-  }
+  const sectionRanges = pageClassificationsToRanges(classifications);
 
   // Front matter for metadata extraction runs from page 1 through the end of
   // the "introduction" range. Falls back to a fixed window if intro wasn't
-  // found (e.g. no LOEP was located, or the doc has no distinct Introduction
-  // section).
+  // found (e.g. the doc has no distinct Introduction section).
   const introRange = sectionRanges.find((r) => r.sectionId === 'introduction');
   const frontMatterEndPage = introRange ? introRange.endPage : Math.min(20, totalPages);
   const frontMatterPages = await extractPdfTextRange(uploadedFilePath, 1, frontMatterEndPage);

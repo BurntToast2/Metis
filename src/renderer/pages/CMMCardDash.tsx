@@ -9,8 +9,6 @@ interface CMMSection {
   endPage: number;
 }
 
-// ASSUMPTION: shape unknown — treating it as either a plain string or a
-// flat object of label/value pairs. Swap this out once the real shape is known.
 type CMMSummary = string | Record<string, string | number>;
 
 interface CMMCardDashProps {
@@ -128,7 +126,7 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
               <motion.div
                 key={section.sectionId}
                 className={`cmm-card-dash__section-card ${
-                    currentPage >= section.startPage && currentPage <= section.endPage
+                  currentPage >= section.startPage && currentPage <= section.endPage
                     ? 'cmm-card-dash__section-card--active'
                     : ''
                 }`}
@@ -136,8 +134,7 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 18, delay: i * 0.05 }}
-                whileHover={{ y: -3, boxShadow: '0 4px 12px rgba(12, 31, 63, 0.1)' }}
-                >
+              >
                 {previewsReady ? (
                   <img
                     src={`cmm-asset://asset/${cmm.id}/sections/${section.sectionId}.png`}

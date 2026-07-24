@@ -35,9 +35,6 @@ export function registerCmmAssetProtocolHandler() {
       }
     }
 
-    // NEW: cmm-asset://asset/<id>/sections/<sectionId>.png
-    // Section preview thumbnails, generated on-demand by
-    // ensureCmmSectionPreviews and cached to disk under the CMM's folder.
     const sectionMatch = pathname.match(/^(\d+)\/sections\/([\w-]+)\.png$/);
     if (sectionMatch) {
       const id = Number(sectionMatch[1]);
@@ -51,7 +48,6 @@ export function registerCmmAssetProtocolHandler() {
       }
     }
 
-    // --- existing id-based logic below, unchanged ---
     const [idSegment, assetName] = pathname.split('/');
     const id = Number(idSegment);
 
