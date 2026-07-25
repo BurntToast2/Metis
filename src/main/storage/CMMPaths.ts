@@ -34,3 +34,15 @@ export function getCmmSectionsFolderPath(id: number): string {
 export function getCmmSectionPreviewPath(id: number, sectionId: string): string {
   return path.join(getCmmSectionsFolderPath(id), `${sectionId}.png`);
 }
+
+export function getCmmExtractedSectionsFolderPath(id: number, extractionType: string): string {
+  return path.join(getCmmFolderPath(id), 'extractedSections', extractionType);
+}
+
+export function getCmmExtractedSectionPath(
+  id: number,
+  extractionType: string,
+  sectionId: string,
+): string {
+  return path.join(getCmmExtractedSectionsFolderPath(id, extractionType), `${sectionId}.json`);
+}

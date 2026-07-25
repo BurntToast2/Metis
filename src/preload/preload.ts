@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer, webUtils } from 'electron';
 import { pathToFileURL } from 'url';
 import type { CMMRecord } from '../shared/types/cmm';
+import type { SectionRef, TestingExtractionResult } from '../main/sections/testing/testing.types';
 
 
 console.log('preload loaded, pathToFileURL:', typeof pathToFileURL);
@@ -35,4 +36,6 @@ contextBridge.exposeInMainWorld('api', {
   getCmmSections: (id: number) => ipcRenderer.invoke('get-cmm-sections', id),
   getCmmSummary: (id: number) => ipcRenderer.invoke('get-cmm-summary', id),
   ensureCmmSectionPreviews: (id: number) => ipcRenderer.invoke('ensure-cmm-section-previews', id),
+  extractTestingTools: (payload: SectionRef): Promise<TestingExtractionResult> =>
+    ipcRenderer.invoke('testing:extractTools', payload),
 });

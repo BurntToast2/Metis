@@ -154,12 +154,11 @@ export async function processNewCmm(
 
   const sectionRanges = pageClassificationsToRanges(classifications);
 
-  // Front matter for metadata extraction runs from page 1 through the end of
-  // the "introduction" range. Falls back to a fixed window if intro wasn't
-  // found (e.g. the doc has no distinct Introduction section).
   const introRange = sectionRanges.find((r) => r.sectionId === 'introduction');
   const frontMatterEndPage = introRange ? introRange.endPage : Math.min(20, totalPages);
-  const frontMatterPages = await extractPdfTextRange(uploadedFilePath, 1, frontMatterEndPage);
+
+  const fullTextPages = await extractPdfTextRange(uploadedFilePath, 1, totalPages);
+  const frontMatterPages = fullTextPages.slice(0, frontMatterEndPage);
 
   const { systemPrompt: metaSystem, userPrompt: metaUser } = buildMetadataPrompt(frontMatterPages);
   const metadata = await getStructuredCompletion<CmmMetadata>(metaSystem, metaUser);
@@ -193,7 +192,7 @@ export async function processNewCmm(
     ),
   );
   await fs.writeFile(getCmmSectionsPath(id), JSON.stringify(sectionRanges, null, 2));
-  await fs.writeFile(getCmmRawTextPath(id), JSON.stringify(frontMatterPages, null, 2));
+  await fs.writeFile(getCmmRawTextPath(id), JSON.stringify(fullTextPages, null, 2));
 
   await db.update(cmms).set({ filePath: folderPath }).where(eq(cmms.id, id));
 

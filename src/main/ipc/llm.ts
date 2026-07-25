@@ -18,7 +18,6 @@ export async function getStructuredCompletion<T>(
   }
 
   const { thinking = false, reasoningEffort = 'high', maxTokens = 8000 } = options;
-
   const body: Record<string, unknown> = {
     model: LLM_MODEL,
     messages: [

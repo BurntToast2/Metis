@@ -54,6 +54,22 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
       .catch((err) => console.error('ensureCmmSectionPreviews failed:', err));
   }, [cmm.id]);
 
+  async function handleSectionClick(section: CMMSection) {
+    setCurrentPage(section.startPage);
+
+    if (section.sectionId === 'testing-fault-isolation') {
+      try {
+        const result = await window.api.extractTestingTools({
+          cmmId: cmm.id,
+          sectionId: section.sectionId,
+        });
+        console.log('testing extraction result:', result);
+      } catch (err) {
+        console.error('testing extraction failed:', err);
+      }
+    }
+  }
+
   return (
     <div className="cmm-card-dash">
       <div className="cmm-card-dash__header">
@@ -124,7 +140,7 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
                   className={`cmm-card-dash__section-card ${
                     isActive ? 'cmm-card-dash__section-card--active' : ''
                   }`}
-                  onClick={() => setCurrentPage(section.startPage)}
+                  onClick={() => handleSectionClick(section)}
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ type: 'spring', stiffness: 300, damping: 18, delay: i * 0.01 }}
