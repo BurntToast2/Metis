@@ -12,7 +12,8 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "jsx": "react-jsx",
-    "types": ["node"]
+    "types": ["node"],
+    "allowArbitraryExtensions": true
   },
   "include": ["src", "forge.env.d.ts"]
 }

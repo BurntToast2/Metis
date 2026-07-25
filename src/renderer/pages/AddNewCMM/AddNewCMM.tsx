@@ -4,6 +4,7 @@ import { UploadStep } from './UploadStep';
 import { ExtractStep } from './ExtractStep';
 import { CMMRecord } from '../../../shared/types/cmm';
 import './AddNewCMM.css';
+import { BooksLoader } from '../../components/BooksLoader';
 
 type Step = 'upload' | 'extract' | 'processing' | 'success';
 
@@ -56,12 +57,8 @@ export function AddNewCMM({ onCmmReady }: AddNewCMMProps) {
   if (step === 'processing') {
     return (
       <div className="add-cmm-status">
-        <motion.div
-          className="add-cmm-status__spinner"
-          animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
-        />
-        <p className="add-cmm-status__message">Extracting CMM data — this may take a moment…</p>
+        <BooksLoader label="" />
+        <h4>Extracting CMM data — this may take a moment…</h4>
       </div>
     );
   }

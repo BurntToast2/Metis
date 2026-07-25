@@ -1,0 +1,12 @@
+/* BooksLoader.css */
+.books-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.books-loader__label {
+  font-size: 13px;
+  color: #5a6472;
+}
