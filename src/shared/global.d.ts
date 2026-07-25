@@ -27,6 +27,7 @@ declare global {
       getCmmSummary: (id: number) => Promise<Record<string, string | number>>;
       ensureCmmSectionPreviews: (id: number) => Promise<{ generated: boolean }>;
       extractTestingTools: (ref: SectionRef) => Promise<TestingExtractionResult>;
+      hasExtractedSection: (args: { cmmId: number; sectionId: string }) => Promise<boolean>;
     };
   }
 }

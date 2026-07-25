@@ -33,6 +33,7 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [previewsReady, setPreviewsReady] = useState(false);
   const [openTaskSection, setOpenTaskSection] = useState<CMMSection | null>(null);
+  const [extractionStatus, setExtractionStatus] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     setIsLoading(true);
@@ -57,6 +58,20 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
       .then(() => setPreviewsReady(true))
       .catch((err) => console.error('ensureCmmSectionPreviews failed:', err));
   }, [cmm.id]);
+
+  useEffect(() => {
+    if (sections.length === 0) return;
+
+    Promise.all(
+      sections.map((s) =>
+        window.api
+          .hasExtractedSection({ cmmId: cmm.id, sectionId: s.sectionId })
+          .then((has) => [s.sectionId, has] as const),
+      ),
+    )
+      .then((entries) => setExtractionStatus(Object.fromEntries(entries)))
+      .catch((err) => console.error('extraction status check failed:', err));
+  }, [cmm.id, sections]);
 
   function handleSectionClick(section: CMMSection) {
     if (TASK_ENABLED_SECTIONS.includes(section.sectionId)) {
@@ -141,12 +156,20 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
           <div className="cmm-card-dash__sections">
             {sections.map((section, i) => {
               const isActive = currentPage >= section.startPage && currentPage <= section.endPage;
+              const extractionKnown = section.sectionId in extractionStatus;
+              const isExtracted = extractionStatus[section.sectionId];
 
               return (
                 <motion.div
                   key={section.sectionId}
                   className={`cmm-card-dash__section-card ${
                     isActive ? 'cmm-card-dash__section-card--active' : ''
+                  } ${
+                    extractionKnown
+                      ? isExtracted
+                        ? 'cmm-card-dash__section-card--extracted'
+                        : 'cmm-card-dash__section-card--not-extracted'
+                      : ''
                   }`}
                   onClick={() => handleSectionClick(section)}
                   initial={{ opacity: 0, y: 12 }}

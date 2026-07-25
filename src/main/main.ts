@@ -6,7 +6,8 @@ import { registerCMMHandlers } from './ipc/cmm';
 import { registerCmmAssetSchemeAsPrivileged, registerCmmAssetProtocolHandler, } from './storage/CMMProtocol';
 import { registerCmmProcessingHandlers } from './ipc/cmmProcessing'; // was './ipc/cmm-Processing'
 import { registerEnsureCmmSectionPreviewsHandler } from './ipc/ensureCMMSectionPreview';
-import { registerTestingHandlers } from './ipc/testing.handlers';
+import { registerTestingHandlers } from './ipc/sections/testing/testing.handlers';
+import { registerExtractionStatusHandler } from './ipc/sections/testing/extractionStatus.handlers';
 
 if (started) {
   app.quit();
@@ -46,6 +47,7 @@ app.on('ready', () => {
   registerCmmProcessingHandlers(); 
   registerEnsureCmmSectionPreviewsHandler();
   registerTestingHandlers();
+  registerExtractionStatusHandler();
   createWindow();
 });
 

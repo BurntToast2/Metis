@@ -38,4 +38,6 @@ contextBridge.exposeInMainWorld('api', {
   ensureCmmSectionPreviews: (id: number) => ipcRenderer.invoke('ensure-cmm-section-previews', id),
   extractTestingTools: (payload: SectionRef): Promise<TestingExtractionResult> =>
     ipcRenderer.invoke('testing:extractTools', payload),
+  hasExtractedSection: (args: { cmmId: number; sectionId: string }) =>
+  ipcRenderer.invoke('has-extracted-section', args),
 });

@@ -113,6 +113,14 @@
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
 }
 
+.cmm-card-dash__section-card--extracted {
+  background: linear-gradient(135deg, #f6e6c4 0%, #ffffff 70%);
+}
+
+.cmm-card-dash__section-card--not-extracted {
+  background: linear-gradient(135deg, #f3b7ab 0%, #ffffff 70%);
+}
+
 .cmm-card-dash__section-badge {
   position: absolute;
   top: 10px;
