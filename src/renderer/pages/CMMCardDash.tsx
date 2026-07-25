@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { CMMRecord } from '../../shared/types/cmm';
+import { TestingFaultIsolationDash } from './Sections/Testing/TestingFaultIsolationDash';
 import './CMMCardDash.css';
 
 interface CMMSection {
@@ -16,6 +17,8 @@ interface CMMCardDashProps {
   onBack: () => void;
 }
 
+const TASK_ENABLED_SECTIONS = ['testing-fault-isolation'];
+
 function sectionLabel(sectionId: string): string {
   return sectionId
     .split('-')
@@ -29,6 +32,7 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [previewsReady, setPreviewsReady] = useState(false);
+  const [openTaskSection, setOpenTaskSection] = useState<CMMSection | null>(null);
 
   useEffect(() => {
     setIsLoading(true);
@@ -54,20 +58,24 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
       .catch((err) => console.error('ensureCmmSectionPreviews failed:', err));
   }, [cmm.id]);
 
-  async function handleSectionClick(section: CMMSection) {
-    setCurrentPage(section.startPage);
-
-    if (section.sectionId === 'testing-fault-isolation') {
-      try {
-        const result = await window.api.extractTestingTools({
-          cmmId: cmm.id,
-          sectionId: section.sectionId,
-        });
-        console.log('testing extraction result:', result);
-      } catch (err) {
-        console.error('testing extraction failed:', err);
-      }
+  function handleSectionClick(section: CMMSection) {
+    if (TASK_ENABLED_SECTIONS.includes(section.sectionId)) {
+      setOpenTaskSection(section);
+    } else {
+      setCurrentPage(section.startPage);
     }
+  }
+
+  if (openTaskSection) {
+    return (
+      <div className="cmm-card-dash">
+        <TestingFaultIsolationDash
+          cmm={cmm}
+          section={openTaskSection}
+          onBack={() => setOpenTaskSection(null)}
+        />
+      </div>
+    );
   }
 
   return (

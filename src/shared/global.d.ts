@@ -1,4 +1,5 @@
 import { CMMRecord } from './types/cmm';
+import { SectionRef, TestingExtractionResult } from './types/testing';
 
 export {};
 
@@ -25,7 +26,7 @@ declare global {
       getCmmSections: (id: number) => Promise<{ sectionId: string; startPage: number; endPage: number }[]>;
       getCmmSummary: (id: number) => Promise<Record<string, string | number>>;
       ensureCmmSectionPreviews: (id: number) => Promise<{ generated: boolean }>;
-      extractTestingTools: ({ cmmId: id, sectionId }) => Promise<{ cmmId: number; sectionId: string; }>;
+      extractTestingTools: (ref: SectionRef) => Promise<TestingExtractionResult>;
     };
   }
 }
