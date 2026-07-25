@@ -1,3 +1,9 @@
+@property --cmm-gradient-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
 .cmm-card-dash {
   display: flex;
   flex-direction: column;
@@ -14,9 +20,19 @@
 .cmm-card-dash__back {
   background: none;
   border: none;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
   color: #0c1f3f;
+  padding: 6px 10px;
+  margin: -6px -10px;
+  transition: color 0.2s ease, background 0.25s ease, transform 0.2s ease;
+}
+
+.cmm-card-dash__back:hover {
+  color: #b3261e;
+  background: linear-gradient(135deg, #f7d9cf 0%, #f3b7ab 55%, #e8887a 100%);
+  transform: translateX(-2px);
 }
 
 .cmm-card-dash__title {
@@ -91,8 +107,15 @@
 .cmm-card-dash__section-card::before {
   content: '';
   position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, #f6e6c4 0%, #f7d9cf 55%, #e8a99a 100%);
+  inset: -50%;
+  background: conic-gradient(
+    from var(--cmm-gradient-angle),
+    #f6e6c4 0%,
+    #f7d9cf 30%,
+    #e8a99a 55%,
+    #f7d9cf 80%,
+    #f6e6c4 100%
+  );
   opacity: 0;
   transition: opacity 0.25s ease;
   pointer-events: none;
@@ -101,6 +124,13 @@
 
 .cmm-card-dash__section-card:hover::before {
   opacity: 1;
+  animation: cmm-card-gradient-spin 3s linear infinite;
+}
+
+@keyframes cmm-card-gradient-spin {
+  to {
+    --cmm-gradient-angle: 360deg;
+  }
 }
 
 .cmm-card-dash__section-card > * {
