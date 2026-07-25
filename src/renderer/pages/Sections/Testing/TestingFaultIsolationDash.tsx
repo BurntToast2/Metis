@@ -42,6 +42,15 @@ export function TestingFaultIsolationDash({ cmm, section, onBack }: TestingFault
   const selectedTask: Task | null =
     result && selectedTaskId ? result.tasks.find((t) => t.id === selectedTaskId) ?? null : null;
 
+  // ManualView wraps a native <embed> PDF viewer — its scroll/zoom/page state
+  // lives inside the browser plugin instance, invisible to React. Unmounting
+  // it (e.g. via a ternary keyed on activeTab or selectedTask) destroys that
+  // instance, and any later remount reloads the PDF from scratch. So it's
+  // mounted once, here, whenever `result` exists, and visibility is toggled
+  // with CSS instead of conditional rendering — the DOM node (and the plugin
+  // underneath it) never goes away for the lifetime of this component.
+  const showManualView = Boolean(result) && activeTab === 'manual' && !selectedTask;
+
   return (
     <div className="tfi-dash">
       <div className="tfi-dash__header">
@@ -58,29 +67,37 @@ export function TestingFaultIsolationDash({ cmm, section, onBack }: TestingFault
         </div>
       ) : error ? (
         <p className="tfi-dash__error">{error}</p>
-      ) : !result ? null : selectedTask ? (
-        <TaskDetail task={selectedTask} onBack={() => setSelectedTaskId(null)} />
-      ) : (
+      ) : null}
+
+      {result && (
         <>
-          <div className="tfi-dash__tabs">
-            <button
-              className={`tfi-dash__tab ${activeTab === 'manual' ? 'tfi-dash__tab--active' : ''}`}
-              onClick={() => setActiveTab('manual')}
-            >
-              Manual View
-            </button>
-            <button
-              className={`tfi-dash__tab ${activeTab === 'tasks' ? 'tfi-dash__tab--active' : ''}`}
-              onClick={() => setActiveTab('tasks')}
-            >
-              Task Breakdown
-            </button>
+          {!selectedTask && (
+            <div className="tfi-dash__tabs">
+              <button
+                className={`tfi-dash__tab ${activeTab === 'manual' ? 'tfi-dash__tab--active' : ''}`}
+                onClick={() => setActiveTab('manual')}
+              >
+                Manual View
+              </button>
+              <button
+                className={`tfi-dash__tab ${activeTab === 'tasks' ? 'tfi-dash__tab--active' : ''}`}
+                onClick={() => setActiveTab('tasks')}
+              >
+                Task Breakdown
+              </button>
+            </div>
+          )}
+
+          <div style={{ display: showManualView ? 'block' : 'none' }}>
+            <ManualView cmmId={cmm.id} startPage={section.startPage} />
           </div>
 
-          {activeTab === 'manual' ? (
-            <ManualView cmmId={cmm.id} startPage={section.startPage} />
+          {selectedTask ? (
+            <TaskDetail task={selectedTask} onBack={() => setSelectedTaskId(null)} />
           ) : (
-            <TaskBreakdown tasks={result.tasks} onSelectTask={setSelectedTaskId} />
+            activeTab === 'tasks' && (
+              <TaskBreakdown tasks={result.tasks} onSelectTask={setSelectedTaskId} />
+            )
           )}
         </>
       )}

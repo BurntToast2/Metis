@@ -53,7 +53,9 @@ export async function runTestingExtraction({
     validSectionIds,
   );
 
-  const referencedSections = rawReferencedSections.filter((ref) => {
+  // Backstop in case the model reports something outside the constraint
+  // above anyway — drop it rather than crash step 2 trying to resolve it.
+  const modelReferencedSections = rawReferencedSections.filter((ref) => {
     const isValid = validSectionIds.includes(ref.sectionId);
     if (!isValid) {
       console.warn(
@@ -63,7 +65,25 @@ export async function runTestingExtraction({
     return isValid;
   });
 
-  // Step 2: no LLM involved — resolve each referenced section's pages from sections.json, then pull its actual text out of raw-text.json.
+  // introduction and description-operation are always folded in as baseline
+  // context — the general operating principles they contain can matter for
+  // interpreting a test step even when the testing section never explicitly
+  // cites them, unlike disassembly/repairs/etc. which only get pulled in when
+  // the model actually finds a reference. Only added if this particular CMM
+  // has that section at all (not every manual does).
+  const ALWAYS_INCLUDED_SECTION_IDS = ['introduction', 'description-operation'];
+  const baselineSectionIds = ALWAYS_INCLUDED_SECTION_IDS.filter((id) =>
+    validSectionIds.includes(id),
+  );
+
+  const referencedSectionIdSet = new Set([
+    ...modelReferencedSections.map((r) => r.sectionId),
+    ...baselineSectionIds,
+  ]);
+  const referencedSections = [...referencedSectionIdSet].map((id) => ({ sectionId: id }));
+
+  // Step 2: no LLM involved — resolve each referenced section's pages from
+  // sections.json, then pull its actual text out of raw-text.json.
   const referencedContents = referencedSections.map((ref) => ({
     sectionId: ref.sectionId,
     content: getSectionContent(index, ref.sectionId),
