@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
 import { access } from 'fs/promises';
-import { getCmmExtractedSectionPath } from '../../../storage//CMMPaths';
+import { getCmmExtractedSectionPath } from '../../storage/CMMPaths';
 
 const SECTION_EXTRACTION_KIND: Record<string, string> = {
   'testing-fault-isolation': 'testing',

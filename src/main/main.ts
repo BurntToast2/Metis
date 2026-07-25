@@ -7,7 +7,7 @@ import { registerCmmAssetSchemeAsPrivileged, registerCmmAssetProtocolHandler, } 
 import { registerCmmProcessingHandlers } from './ipc/cmmProcessing'; // was './ipc/cmm-Processing'
 import { registerEnsureCmmSectionPreviewsHandler } from './ipc/ensureCMMSectionPreview';
 import { registerTestingHandlers } from './ipc/sections/testing/testing.handlers';
-import { registerExtractionStatusHandler } from './ipc/sections/testing/extractionStatus.handlers';
+import { registerExtractionStatusHandler } from './ipc/sections/extractionStatus.handlers';
 
 if (started) {
   app.quit();
