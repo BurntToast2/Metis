@@ -4,6 +4,7 @@ import { getCmmExtractedSectionPath } from '../../storage/CMMPaths';
 
 const SECTION_EXTRACTION_KIND: Record<string, string> = {
   'testing-fault-isolation': 'testing',
+  'disassembly': 'disassembly',
 };
 
 export function registerExtractionStatusHandler() {

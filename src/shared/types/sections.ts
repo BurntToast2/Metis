@@ -1,4 +1,4 @@
-// src/shared/types/testing.ts
+// src/shared/types/sections.ts
 export interface SectionRef {
   cmmId: number;
   sectionId: string;
@@ -44,7 +44,7 @@ export interface TaskExtractionResponse {
   tasks: Task[];
 }
 
-export interface TestingExtractionResult {
+export interface SectionExtractionResult {
   cmmId: number;
   sectionId: string;
   referencedSectionIds: string[];

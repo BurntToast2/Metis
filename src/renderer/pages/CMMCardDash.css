@@ -1,3 +1,4 @@
+/* CMMCardDash.css */
 @property --cmm-gradient-angle {
   syntax: '<angle>';
   initial-value: 0deg;
@@ -122,7 +123,7 @@
   z-index: 0;
 }
 
-.cmm-card-dash__section-card:hover::before {
+.cmm-card-dash__section-card--extracting::before {
   opacity: 1;
   animation: cmm-card-gradient-spin 3s linear infinite;
 }
@@ -144,11 +145,18 @@
 }
 
 .cmm-card-dash__section-card--extracted {
-  background: linear-gradient(135deg, #f6e6c4 0%, #ffffff 70%);
+  background: linear-gradient(135deg, #cfead0 0%, #ffffff 70%);
 }
 
 .cmm-card-dash__section-card--not-extracted {
   background: linear-gradient(135deg, #f3b7ab 0%, #ffffff 70%);
+}
+
+.cmm-card-dash__section-status {
+  font-size: 12px;
+  font-weight: 600;
+  color: #b3261e;
+  margin: 0;
 }
 
 .cmm-card-dash__section-badge {

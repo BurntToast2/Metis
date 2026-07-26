@@ -4,7 +4,7 @@ import { Task, SectionExtractionResult } from '../../../../shared/types/sections
 import { ManualView } from '../Shared/ManualView';
 import { TaskBreakdown } from '../Shared/TaskBreakdown';
 import { TaskDetail } from '../Shared/TaskDetail';
-import './TestingFaultIsolationDash.css';
+import './DisassemblyDash.css';
 
 interface CMMSection {
   sectionId: string;
@@ -12,7 +12,7 @@ interface CMMSection {
   endPage: number;
 }
 
-interface TestingFaultIsolationDashProps {
+interface DisassemblyDashProps {
   cmm: CMMRecord;
   section: CMMSection;
   onBack: () => void;
@@ -20,7 +20,7 @@ interface TestingFaultIsolationDashProps {
 
 type Tab = 'manual' | 'tasks';
 
-export function TestingFaultIsolationDash({ cmm, section, onBack }: TestingFaultIsolationDashProps) {
+export function DisassemblyDash({ cmm, section, onBack }: DisassemblyDashProps) {
   const [result, setResult] = useState<SectionExtractionResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,10 +30,10 @@ export function TestingFaultIsolationDash({ cmm, section, onBack }: TestingFault
   useEffect(() => {
     setIsLoading(true);
     setError(null);
-    window.api.extractTestingTools({ cmmId: cmm.id, sectionId: section.sectionId })
+    window.api.extractDisassemblyTools({ cmmId: cmm.id, sectionId: section.sectionId })
       .then(setResult)
       .catch((err) => {
-        console.error('extractTestingTools failed:', err);
+        console.error('extractDisassemblyTools failed:', err);
         setError('Failed to extract task data for this section.');
       })
       .finally(() => setIsLoading(false));
@@ -52,35 +52,35 @@ export function TestingFaultIsolationDash({ cmm, section, onBack }: TestingFault
   const showManualView = Boolean(result) && activeTab === 'manual' && !selectedTask;
 
   return (
-    <div className="tfi-dash">
-      <div className="tfi-dash__header">
-        <button className="tfi-dash__back" onClick={onBack}>
+    <div className="disassembly-dash">
+      <div className="disassembly-dash__header">
+        <button className="disassembly-dash__back" onClick={onBack}>
           ← Back to CMM
         </button>
-        <h2 className="tfi-dash__title">Testing &amp; Fault Isolation</h2>
+        <h2 className="disassembly-dash__title">Disassembly</h2>
       </div>
 
       {isLoading ? (
-        <div className="tfi-dash__loading">
-          <div className="tfi-dash__spinner" />
+        <div className="disassembly-dash__loading">
+          <div className="disassembly-dash__spinner" />
           <p>Extracting tasks and tools — this may take a moment on first open…</p>
         </div>
       ) : error ? (
-        <p className="tfi-dash__error">{error}</p>
+        <p className="disassembly-dash__error">{error}</p>
       ) : null}
 
       {result && (
         <>
           {!selectedTask && (
-            <div className="tfi-dash__tabs">
+            <div className="disassembly-dash__tabs">
               <button
-                className={`tfi-dash__tab ${activeTab === 'manual' ? 'tfi-dash__tab--active' : ''}`}
+                className={`disassembly-dash__tab ${activeTab === 'manual' ? 'disassembly-dash__tab--active' : ''}`}
                 onClick={() => setActiveTab('manual')}
               >
                 Manual View
               </button>
               <button
-                className={`tfi-dash__tab ${activeTab === 'tasks' ? 'tfi-dash__tab--active' : ''}`}
+                className={`disassembly-dash__tab ${activeTab === 'tasks' ? 'disassembly-dash__tab--active' : ''}`}
                 onClick={() => setActiveTab('tasks')}
               >
                 Task Breakdown

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Task } from '../../../../shared/types/testing';
+import { Task } from '../../../../shared/types/sections';
 import { TaskCard } from './TaskCard';
 
 interface TaskBreakdownProps {

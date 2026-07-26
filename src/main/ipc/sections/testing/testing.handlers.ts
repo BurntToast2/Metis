@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
 import { runTestingExtraction } from '../../../sections/testing/testingExtraction.service';
-import type { SectionRef } from '../../../sections/testing/testing.types';
+import type { SectionRef } from '../../../sections/common/section.types';
 
 export function registerTestingHandlers(): void {
   ipcMain.handle('testing:extractTools', async (_event, payload: SectionRef) => {

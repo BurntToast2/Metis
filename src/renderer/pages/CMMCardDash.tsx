@@ -1,7 +1,10 @@
+// CMMCardDash.tsx
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { CMMRecord } from '../../shared/types/cmm';
+import { SectionRef, SectionExtractionResult } from '../../shared/types/sections';
 import { TestingFaultIsolationDash } from './Sections/Testing/TestingFaultIsolationDash';
+import { DisassemblyDash } from './Sections/Disassembly/DisassemblyDash';
 import './CMMCardDash.css';
 
 interface CMMSection {
@@ -17,13 +20,29 @@ interface CMMCardDashProps {
   onBack: () => void;
 }
 
-const TASK_ENABLED_SECTIONS = ['testing-fault-isolation'];
+const TASK_ENABLED_SECTIONS = ['testing-fault-isolation', 'disassembly'];
+
+const SECTION_EXTRACTORS: Record<string, (ref: SectionRef) => Promise<SectionExtractionResult>> = {
+  'testing-fault-isolation': window.api.extractTestingTools,
+  disassembly: window.api.extractDisassemblyTools,
+};
 
 function sectionLabel(sectionId: string): string {
   return sectionId
     .split('-')
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
+}
+
+function renderSectionDash(cmm: CMMRecord, section: CMMSection, onBack: () => void) {
+  switch (section.sectionId) {
+    case 'testing-fault-isolation':
+      return <TestingFaultIsolationDash cmm={cmm} section={section} onBack={onBack} />;
+    case 'disassembly':
+      return <DisassemblyDash cmm={cmm} section={section} onBack={onBack} />;
+    default:
+      return null;
+  }
 }
 
 export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
@@ -34,6 +53,7 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
   const [previewsReady, setPreviewsReady] = useState(false);
   const [openTaskSection, setOpenTaskSection] = useState<CMMSection | null>(null);
   const [extractionStatus, setExtractionStatus] = useState<Record<string, boolean>>({});
+  const [extractingSectionId, setExtractingSectionId] = useState<string | null>(null);
 
   useEffect(() => {
     setIsLoading(true);
@@ -73,22 +93,40 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
       .catch((err) => console.error('extraction status check failed:', err));
   }, [cmm.id, sections]);
 
-  function handleSectionClick(section: CMMSection) {
-    if (TASK_ENABLED_SECTIONS.includes(section.sectionId)) {
-      setOpenTaskSection(section);
-    } else {
+  async function handleSectionClick(section: CMMSection) {
+    if (!TASK_ENABLED_SECTIONS.includes(section.sectionId)) {
       setCurrentPage(section.startPage);
+      return;
+    }
+
+    // Already extracted — no spinner needed, go straight in.
+    if (extractionStatus[section.sectionId]) {
+      setOpenTaskSection(section);
+      return;
+    }
+
+    const extractor = SECTION_EXTRACTORS[section.sectionId];
+    if (!extractor) {
+      console.error(`No extractor registered for section "${section.sectionId}"`);
+      return;
+    }
+
+    setExtractingSectionId(section.sectionId);
+    try {
+      await extractor({ cmmId: cmm.id, sectionId: section.sectionId });
+      setExtractionStatus((prev) => ({ ...prev, [section.sectionId]: true }));
+      setOpenTaskSection(section);
+    } catch (err) {
+      console.error(`extraction failed for "${section.sectionId}":`, err);
+    } finally {
+      setExtractingSectionId(null);
     }
   }
 
   if (openTaskSection) {
     return (
       <div className="cmm-card-dash">
-        <TestingFaultIsolationDash
-          cmm={cmm}
-          section={openTaskSection}
-          onBack={() => setOpenTaskSection(null)}
-        />
+        {renderSectionDash(cmm, openTaskSection, () => setOpenTaskSection(null))}
       </div>
     );
   }
@@ -158,6 +196,7 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
               const isActive = currentPage >= section.startPage && currentPage <= section.endPage;
               const extractionKnown = section.sectionId in extractionStatus;
               const isExtracted = extractionStatus[section.sectionId];
+              const isExtracting = extractingSectionId === section.sectionId;
 
               return (
                 <motion.div
@@ -165,11 +204,13 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
                   className={`cmm-card-dash__section-card ${
                     isActive ? 'cmm-card-dash__section-card--active' : ''
                   } ${
-                    extractionKnown
-                      ? isExtracted
-                        ? 'cmm-card-dash__section-card--extracted'
-                        : 'cmm-card-dash__section-card--not-extracted'
-                      : ''
+                    isExtracting
+                      ? 'cmm-card-dash__section-card--extracting'
+                      : extractionKnown
+                        ? isExtracted
+                          ? 'cmm-card-dash__section-card--extracted'
+                          : 'cmm-card-dash__section-card--not-extracted'
+                        : ''
                   }`}
                   onClick={() => handleSectionClick(section)}
                   initial={{ opacity: 0, y: 12 }}
@@ -199,6 +240,9 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
                   <p className="cmm-card-dash__section-pages">
                     pp. {section.startPage}–{section.endPage}
                   </p>
+                  {isExtracting && (
+                    <p className="cmm-card-dash__section-status">Extracting…</p>
+                  )}
                 </motion.div>
               );
             })}

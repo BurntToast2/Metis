@@ -1,4 +1,4 @@
-import { Task } from '../../../../shared/types/testing';
+import { Task } from '../../../../shared/types/sections';
 
 interface TaskDetailProps {
   task: Task;
