@@ -1,10 +1,12 @@
-import { useState, FormEvent } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { ManualSearchResult } from '../../../shared/types/search';
 import './SearchPage.css';
 
 interface SearchPageProps {
   onOpenResult: (cmmId: number, title: string, page: number) => void;
 }
+
+const DEBOUNCE_MS = 300;
 
 export function SearchPage({ onOpenResult }: SearchPageProps) {
   const [query, setQuery] = useState('');
@@ -13,41 +15,59 @@ export function SearchPage({ onOpenResult }: SearchPageProps) {
   const [hasSearched, setHasSearched] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function runSearch(e?: FormEvent) {
-    e?.preventDefault();
+  const latestQueryRef = useRef('');
+
+  useEffect(() => {
     const trimmed = query.trim();
-    if (!trimmed) return;
+
+    if (!trimmed) {
+      setResults([]);
+      setHasSearched(false);
+      setError(null);
+      setIsSearching(false);
+      return;
+    }
 
     setIsSearching(true);
     setError(null);
-    try {
-      const res = await window.api.searchManuals(trimmed);
-      setResults(res);
-      setHasSearched(true);
-    } catch (err) {
-      console.error('searchManuals failed:', err);
-      setError('Search failed. Please try again.');
-    } finally {
-      setIsSearching(false);
-    }
-  }
+
+    const timer = setTimeout(async () => {
+      latestQueryRef.current = trimmed;
+      try {
+        const res = await window.api.searchManuals(trimmed);
+        if (latestQueryRef.current === trimmed) {
+          setResults(res);
+          setHasSearched(true);
+        }
+      } catch (err) {
+        console.error('searchManuals failed:', err);
+        if (latestQueryRef.current === trimmed) {
+          setError('Search failed. Please try again.');
+        }
+      } finally {
+        if (latestQueryRef.current === trimmed) {
+          setIsSearching(false);
+        }
+      }
+    }, DEBOUNCE_MS);
+
+    return () => clearTimeout(timer);
+  }, [query]);
 
   return (
     <div className="search-page">
       <h2 className="search-page__title">Search Manuals</h2>
 
-      <form className="search-page__form" onSubmit={runSearch}>
-        <input
-          type="text"
-          placeholder="Search by part number, word, or phrase..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="search-page__input"
-        />
-        <button type="submit" className="search-page__submit" disabled={isSearching}>
-          {isSearching ? 'Searching…' : 'Search'}
-        </button>
-      </form>
+      <input
+        type="text"
+        placeholder="Search by part number, word, or phrase..."
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        className="search-page__input"
+        autoFocus
+      />
+
+      {isSearching && <p className="search-page__status">Searching…</p>}
 
       {error && <p className="search-page__error">{error}</p>}
 
