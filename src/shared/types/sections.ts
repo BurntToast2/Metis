@@ -3,16 +3,22 @@ export interface SectionRef {
   sectionId: string;
 }
 
+export type ToolType = 'Standard' | 'Commercial' | 'Special' | 'General';
+
 export interface Tool {
   name: string;
-  partNumber?: string;
-  quantity?: string;
+  pn?: string;
+  type: ToolType;
+  usedIn?: string;
+  calibrated: boolean;
+  notes?: string;
 }
 
 export interface Consumable {
-  name: string;
-  partNumber?: string;
-  quantity?: string;
+  code: string;
+  description: string;
+  spec?: string;
+  category?: string;
 }
 
 export interface SubTask {
