@@ -1,4 +1,3 @@
-// CMMCardDash.tsx
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { CMMRecord } from '../../shared/types/cmm';
@@ -99,7 +98,6 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
       return;
     }
 
-    // Already extracted — no spinner needed, go straight in.
     if (extractionStatus[section.sectionId]) {
       setOpenTaskSection(section);
       return;
@@ -160,12 +158,14 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
               ) : (
                 <dl className="cmm-card-dash__summary-list">
                   {summary &&
-                    Object.entries(summary).map(([key, value]) => (
-                      <div key={key} className="cmm-card-dash__summary-row">
-                        <dt>{key}</dt>
-                        <dd>{String(value)}</dd>
-                      </div>
-                    ))}
+                    Object.entries(summary)
+                      .filter(([key]) => !['revision', 'revisionDate', 'cmmNumber', 'manufacturer'].includes(key))
+                      .map(([key, value]) => (
+                        <div key={key} className="cmm-card-dash__summary-row">
+                          <dt>{key}</dt>
+                          <dd>{String(value)}</dd>
+                        </div>
+                      ))}
                 </dl>
               )}
               <dl className="cmm-card-dash__summary-list">

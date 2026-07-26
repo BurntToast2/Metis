@@ -1,4 +1,3 @@
-// src/shared/types/sections.ts
 export interface SectionRef {
   cmmId: number;
   sectionId: string;

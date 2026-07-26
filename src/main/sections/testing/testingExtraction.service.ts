@@ -37,12 +37,8 @@ async function saveExtractionResult(result: SectionExtractionResult): Promise<vo
 export async function runTestingExtraction({
   cmmId,
   sectionId,
-<<<<<<< HEAD
-}: SectionRef): Promise<TestingExtractionResult> {
-=======
 }: SectionRef): Promise<SectionExtractionResult> {
   // Skip the whole pipeline if we've already extracted this section before.
->>>>>>> 752124f (disassembly works)
   const existing = await readExistingResult(cmmId, sectionId);
   if (existing) {
     return existing;

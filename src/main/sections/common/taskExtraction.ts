@@ -1,4 +1,3 @@
-// common/taskExtraction.ts
 import { getStructuredCompletion } from '../../ipc/llm';
 import type { TaskExtractionResponse } from './section.types';
 

@@ -1,4 +1,3 @@
-// common/referenceExtraction.ts
 import { getStructuredCompletion } from '../../ipc/llm';
 import type { ReferenceFinderResponse } from './section.types';
 

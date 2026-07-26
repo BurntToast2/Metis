@@ -145,11 +145,11 @@
 }
 
 .cmm-card-dash__section-card--extracted {
-  background: linear-gradient(135deg, #cfead0 0%, #ffffff 70%);
+  background: linear-gradient(290deg, #cfead0 0%, #ffffff 70%);
 }
 
 .cmm-card-dash__section-card--not-extracted {
-  background: linear-gradient(135deg, #f3b7ab 0%, #ffffff 70%);
+  background: linear-gradient(290deg, #f3b7ab 0%, #ffffff 70%);
 }
 
 .cmm-card-dash__section-status {
