@@ -11,6 +11,7 @@ interface NavItem {
   id: string;
   label: string;
   children?: { id: string; label: string }[];
+  relatedIds?: string[]; 
 }
 
 const NAV_ITEMS: NavItem[] = [
@@ -23,6 +24,7 @@ const NAV_ITEMS: NavItem[] = [
       { id: 'cmm-edit', label: 'Edit CMM' },
     ],
   },
+  { id: 'search', label: 'Search', relatedIds: ['search-viewer'] },
   { id: 'settings', label: 'Settings' },
 ];
 
@@ -62,7 +64,10 @@ export function Sidebar({ activePage, onNavigate }: SidebarProps) {
       <div className="sidebar__brand">Metis</div>
       <ul className="sidebar__nav" ref={navRef}>
         {NAV_ITEMS.map((item) => {
-          const isActive = activePage === item.id || item.children?.some((c) => c.id === activePage);
+          const isActive =
+            activePage === item.id ||
+            item.children?.some((c) => c.id === activePage) ||
+            item.relatedIds?.includes(activePage);
           const isFlyoutOpen = openFlyout === item.id;
 
           return (

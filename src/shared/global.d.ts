@@ -1,5 +1,6 @@
 import { CMMRecord } from './types/cmm';
 import { SectionRef, SectionExtractionResult } from './types/sections';
+import { ManualSearchResult } from './types/search';
 
 export {};
 
@@ -29,6 +30,7 @@ declare global {
       extractTestingTools: (ref: SectionRef) => Promise<SectionExtractionResult>;
       hasExtractedSection: (args: { cmmId: number; sectionId: string }) => Promise<boolean>;
       extractDisassemblyTools: (ref: SectionRef) => Promise<SectionExtractionResult>;
+      searchManuals: (query: string) => Promise<ManualSearchResult[]>;
     };
   }
 }

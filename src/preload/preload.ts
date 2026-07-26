@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer, webUtils } from 'electron';
 import { pathToFileURL } from 'url';
 import type { CMMRecord } from '../shared/types/cmm';
 import type { SectionRef, SectionExtractionResult } from '../main/sections/common/section.types';
+import { ManualSearchResult } from '../shared/types/search';
 
 
 console.log('preload loaded, pathToFileURL:', typeof pathToFileURL);
@@ -42,4 +43,6 @@ contextBridge.exposeInMainWorld('api', {
   ipcRenderer.invoke('has-extracted-section', args),
   extractDisassemblyTools: (payload: SectionRef): Promise<SectionExtractionResult> =>
     ipcRenderer.invoke('disassembly:extractTools', payload),
+  searchManuals: (query: string): Promise<ManualSearchResult[]> =>
+    ipcRenderer.invoke('search:manuals', query),
 });

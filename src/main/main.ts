@@ -9,6 +9,7 @@ import { registerEnsureCmmSectionPreviewsHandler } from './ipc/ensureCMMSectionP
 import { registerTestingHandlers } from './ipc/sections/testing/testing.handlers';
 import { registerExtractionStatusHandler } from './ipc/sections/extractionStatus.handlers';
 import { registerDisassemblyHandlers } from './ipc/sections/disassembly/disassembly.handlers';
+import { registerSearchHandlers } from './ipc/search.handlers';
 
 if (started) {
   app.quit();
@@ -50,6 +51,7 @@ app.on('ready', () => {
   registerTestingHandlers();
   registerDisassemblyHandlers();
   registerExtractionStatusHandler();
+  registerSearchHandlers();
   createWindow();
 });
 
