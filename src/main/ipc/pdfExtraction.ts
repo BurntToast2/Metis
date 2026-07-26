@@ -12,6 +12,15 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = pathToFileURL(workerEntryPath).toString
 const standardFontDataUrl =
   path.join(path.dirname(require.resolve('pdfjs-dist/package.json')), 'standard_fonts') + '/';
 
+// Wasm codecs (JBIG2, OpenJPEG/JPX) used to decode certain embedded raster
+// image formats — common in older scanned Boeing manuals. Without this,
+// pdfjs can't locate the wasm binaries outside a browser bundler context,
+// and image decoding fails with "Ensure that the `wasmUrl` API parameter is
+// provided." Text extraction itself doesn't depend on this (getTextContent
+// never touches embedded images), but page rendering does.
+const wasmUrl =
+  path.join(path.dirname(require.resolve('pdfjs-dist/package.json')), 'wasm') + '/';
+
 export interface PageText {
   page: number;
   text: string;
@@ -67,7 +76,7 @@ export async function extractPdfTextRange(
   startPage: number,
   endPage: number,
 ): Promise<PageText[]> {
-  const doc = await pdfjsLib.getDocument({ url: filePath, standardFontDataUrl }).promise;
+  const doc = await pdfjsLib.getDocument({ url: filePath, standardFontDataUrl, wasmUrl }).promise;
   const lastPage = Math.min(endPage, doc.numPages);
 
   const pages: PageText[] = [];
@@ -98,7 +107,7 @@ export async function extractPdfPageBoundarySnippets(
   endPage: number,
   wordsPerEnd = 30,
 ): Promise<PageText[]> {
-  const doc = await pdfjsLib.getDocument({ url: filePath, standardFontDataUrl }).promise;
+  const doc = await pdfjsLib.getDocument({ url: filePath, standardFontDataUrl, wasmUrl }).promise;
   const lastPage = Math.min(endPage, doc.numPages);
 
   const pages: PageText[] = [];
@@ -122,7 +131,7 @@ export async function extractPdfPageBoundarySnippets(
 }
 
 export async function getPdfPageCount(filePath: string): Promise<number> {
-  const doc = await pdfjsLib.getDocument({ url: filePath, standardFontDataUrl }).promise;
+  const doc = await pdfjsLib.getDocument({ url: filePath, standardFontDataUrl, wasmUrl }).promise;
   return doc.numPages;
 }
 
@@ -136,7 +145,7 @@ export async function renderPdfPagePng(
   pageNumber: number,
   scale = 2,
 ): Promise<Buffer> {
-  const doc = await pdfjsLib.getDocument({ url: filePath, standardFontDataUrl }).promise;
+  const doc = await pdfjsLib.getDocument({ url: filePath, standardFontDataUrl, wasmUrl }).promise;
   const page = await doc.getPage(pageNumber);
   const viewport = page.getViewport({ scale });
 
