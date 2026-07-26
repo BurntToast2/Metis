@@ -4,6 +4,7 @@ import { Task, SectionExtractionResult } from '../../../../shared/types/sections
 import { ManualView } from '../Shared/ManualView';
 import { TaskBreakdown } from '../Shared/TaskBreakdown';
 import { TaskDetail } from '../Shared/TaskDetail';
+import '../Shared/Shared.css';
 import './TestingFaultIsolationDash.css';
 
 interface CMMSection {
@@ -56,17 +57,6 @@ export function TestingFaultIsolationDash({ cmm, section, onBack }: TestingFault
     setActiveTab('tasks');
   }
 
-  // ManualView wraps a native <embed> PDF viewer — its scroll/zoom/page state
-  // lives inside the browser plugin instance, invisible to React. Unmounting
-  // it (e.g. via a ternary keyed on activeTab or selectedTask) destroys that
-  // instance, and any later remount reloads the PDF from scratch. So it's
-  // mounted once, here, whenever `result` exists, and visibility is toggled
-  // with CSS instead of conditional rendering — the DOM node (and the plugin
-  // underneath it) never goes away for the lifetime of this component.
-  // Page navigation (jumping to a task's sourcePage) is handled separately via
-  // the `key={page}` on the underlying <embed> in ManualView, which forces a
-  // fresh load at the target page — this is an intentional exception to the
-  // "never remount" rule above, since jumping pages is expected to reset scroll.
   const showManualView = Boolean(result) && activeTab === 'manual';
 
   return (

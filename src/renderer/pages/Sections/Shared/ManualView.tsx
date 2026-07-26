@@ -5,12 +5,12 @@ interface ManualViewProps {
 
 export function ManualView({ cmmId, page }: ManualViewProps) {
   return (
-    <div className="tfi-manual-view">
+    <div className="manual-view">
       <embed
         key={page}
         src={`cmm-asset://asset/${cmmId}/cmm.pdf#page=${page}`}
         type="application/pdf"
-        className="tfi-manual-view__embed"
+        className="manual-view__embed"
       />
     </div>
   );

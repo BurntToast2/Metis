@@ -16,16 +16,16 @@ export function TaskBreakdown({ tasks, onSelectTask }: TaskBreakdownProps) {
     : tasks;
 
   return (
-    <div className="tfi-task-breakdown">
+    <div className="task-breakdown">
       <input
         type="text"
         placeholder="Search tasks..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        className="tfi-task-breakdown__search"
+        className="task-breakdown__search"
       />
 
-      <div className="tfi-task-breakdown__grid">
+      <div className="task-breakdown__grid">
         {filtered.map((task, i) => (
           <motion.div
             key={task.id}
@@ -37,7 +37,7 @@ export function TaskBreakdown({ tasks, onSelectTask }: TaskBreakdownProps) {
           </motion.div>
         ))}
         {filtered.length === 0 && (
-          <p className="tfi-task-breakdown__empty">No tasks match your search.</p>
+          <p className="task-breakdown__empty">No tasks match your search.</p>
         )}
       </div>
     </div>

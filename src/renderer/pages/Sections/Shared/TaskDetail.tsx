@@ -7,11 +7,11 @@ interface TaskDetailProps {
 
 export function TaskDetail({ task }: TaskDetailProps) {
   return (
-    <div className="tfi-task-detail">
-      <h3 className="tfi-task-detail__title">{task.id} — {task.title}</h3>
+    <div className="task-detail">
+      <h3 className="task-detail__title">{task.id} — {task.title}</h3>
 
       {task.subTasks.length > 0 && (
-        <div className="tfi-task-detail__subtasks">
+        <div className="task-detail__subtasks">
           <h4>Sub-tasks</h4>
           <ol>
             {task.subTasks.map((st) => (
@@ -21,12 +21,12 @@ export function TaskDetail({ task }: TaskDetailProps) {
         </div>
       )}
 
-      <div className="tfi-task-detail__tools">
+      <div className="task-detail__tools">
         <h4>Tools</h4>
         {task.tools.length === 0 ? (
-          <p className="tfi-task-detail__empty">No tools listed for this task.</p>
+          <p className="task-detail__empty">No tools listed for this task.</p>
         ) : (
-          <table className="tfi-task-detail__table">
+          <table className="task-detail__table">
             <thead>
               <tr>
                 <th>Name</th>
@@ -53,12 +53,12 @@ export function TaskDetail({ task }: TaskDetailProps) {
         )}
       </div>
 
-      <div className="tfi-task-detail__consumables">
+      <div className="task-detail__consumables">
         <h4>Consumables</h4>
         {task.consumables.length === 0 ? (
-          <p className="tfi-task-detail__empty">No consumables listed for this task.</p>
+          <p className="task-detail__empty">No consumables listed for this task.</p>
         ) : (
-          <table className="tfi-task-detail__table">
+          <table className="task-detail__table">
             <thead>
               <tr>
                 <th>Code</th>
