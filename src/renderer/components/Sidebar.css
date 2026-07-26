@@ -42,10 +42,17 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  outline: none;
 }
 
 .sidebar__nav-item:hover {
   color: #ffffff;
+}
+
+.sidebar__nav-item:focus-visible {
+  color: #ffffff;
+  border-left: 3px solid #c5a046;
+  background: rgba(197, 160, 70, 0.08);
 }
 
 .sidebar__nav-item--active {
@@ -95,6 +102,7 @@
   color: #0c1f3f;
   cursor: pointer;
   white-space: nowrap;
+  outline: none;
 }
 
 .sidebar__flyout-item:hover {
@@ -102,51 +110,13 @@
   color: #8a6d1f;
 }
 
-.sidebar__flyout-item--active {
+.sidebar__flyout-item:focus-visible {
   background: rgba(197, 160, 70, 0.14);
   color: #8a6d1f;
   font-weight: 600;
 }
 
-.sidebar__nav-item {
-  width: 100%;
-  text-align: left;
-  background: none;
-  border: none;
-  border-left: 3px solid transparent;
-  padding: 12px 21px;
-  font-size: 15px;
-  color: #b7c2d6;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  outline: none;
-}
-
-.sidebar__nav-item:focus-visible {
-  outline: none;
-  color: #ffffff;
-  border-left: 3px solid #c5a046;
-  background: rgba(197, 160, 70, 0.08);
-}
-
-.sidebar__flyout-item {
-  text-align: left;
-  background: none;
-  border: none;
-  border-radius: 6px;
-  padding: 10px 14px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #0c1f3f;
-  cursor: pointer;
-  white-space: nowrap;
-  outline: none;
-}
-
-.sidebar__flyout-item:focus-visible {
-  outline: none;
+.sidebar__flyout-item--active {
   background: rgba(197, 160, 70, 0.14);
   color: #8a6d1f;
   font-weight: 600;
