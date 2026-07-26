@@ -4,6 +4,7 @@ import { CMMRecord } from '../../shared/types/cmm';
 import { SectionRef, SectionExtractionResult } from '../../shared/types/sections';
 import { TestingFaultIsolationDash } from './Sections/Testing/TestingFaultIsolationDash';
 import { DisassemblyDash } from './Sections/Disassembly/DisassemblyDash';
+import { CMMViewer } from '../components/CMMViewer';
 import './CMMCardDash.css';
 
 interface CMMSection {
@@ -51,6 +52,7 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [previewsReady, setPreviewsReady] = useState(false);
   const [openTaskSection, setOpenTaskSection] = useState<CMMSection | null>(null);
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [extractionStatus, setExtractionStatus] = useState<Record<string, boolean>>({});
   const [extractingSectionId, setExtractingSectionId] = useState<string | null>(null);
 
@@ -129,6 +131,19 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
     );
   }
 
+  if (isViewerOpen) {
+    return (
+      <div className="cmm-card-dash">
+        <CMMViewer
+          cmmId={cmm.id}
+          title={cmm.title}
+          initialPage={1}
+          onBack={() => setIsViewerOpen(false)}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="cmm-card-dash">
       <div className="cmm-card-dash__header">
@@ -143,7 +158,15 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
       ) : (
         <>
           <div className="cmm-card-dash__top">
-            <div className="cmm-card-dash__viewer">
+            <div
+              className="cmm-card-dash__viewer"
+              onClick={() => setIsViewerOpen(true)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') setIsViewerOpen(true);
+              }}
+            >
               <img
                 src={`cmm-asset://asset/${cmm.id}/cover.png`}
                 alt={cmm.title}

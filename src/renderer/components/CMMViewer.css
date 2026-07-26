@@ -1,0 +1,27 @@
+.cmm-viewer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100%;
+}
+
+.cmm-viewer__header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.cmm-viewer__back {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #0c1f3f;
+  padding: 0;
+  text-align: left;
+}
+
+.cmm-viewer__title {
+  margin: 0;
+}
