@@ -18,7 +18,7 @@ interface DisassemblyDashProps {
   onBack: () => void;
 }
 
-type Tab = 'manual' | 'tasks';
+type Tab = 'manual' | 'tasks' | 'detail';
 
 export function DisassemblyDash({ cmm, section, onBack }: DisassemblyDashProps) {
   const [result, setResult] = useState<SectionExtractionResult | null>(null);
@@ -26,6 +26,7 @@ export function DisassemblyDash({ cmm, section, onBack }: DisassemblyDashProps) 
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>('manual');
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [manualPage, setManualPage] = useState(section.startPage);
 
   useEffect(() => {
     setIsLoading(true);
@@ -42,7 +43,31 @@ export function DisassemblyDash({ cmm, section, onBack }: DisassemblyDashProps) 
   const selectedTask: Task | null =
     result && selectedTaskId ? result.tasks.find((t) => t.id === selectedTaskId) ?? null : null;
 
-  const showManualView = Boolean(result) && activeTab === 'manual' && !selectedTask;
+  function handleSelectTask(taskId: string) {
+    const task = result?.tasks.find((t) => t.id === taskId);
+    setSelectedTaskId(taskId);
+    if (task) {
+      setManualPage(task.sourcePage);
+    }
+    setActiveTab('detail');
+  }
+
+  function handleBackFromDetail() {
+    setActiveTab('tasks');
+  }
+
+  // ManualView wraps a native <embed> PDF viewer — its scroll/zoom/page state
+  // lives inside the browser plugin instance, invisible to React. Unmounting
+  // it (e.g. via a ternary keyed on activeTab or selectedTask) destroys that
+  // instance, and any later remount reloads the PDF from scratch. So it's
+  // mounted once, here, whenever `result` exists, and visibility is toggled
+  // with CSS instead of conditional rendering — the DOM node (and the plugin
+  // underneath it) never goes away for the lifetime of this component.
+  // Page navigation (jumping to a task's sourcePage) is handled separately via
+  // the `key={page}` on the underlying <embed> in ManualView, which forces a
+  // fresh load at the target page — this is an intentional exception to the
+  // "never remount" rule above, since jumping pages is expected to reset scroll.
+  const showManualView = Boolean(result) && activeTab === 'manual';
 
   return (
     <div className="disassembly-dash">
@@ -64,33 +89,38 @@ export function DisassemblyDash({ cmm, section, onBack }: DisassemblyDashProps) 
 
       {result && (
         <>
-          {!selectedTask && (
-            <div className="disassembly-dash__tabs">
-              <button
-                className={`disassembly-dash__tab ${activeTab === 'manual' ? 'disassembly-dash__tab--active' : ''}`}
-                onClick={() => setActiveTab('manual')}
-              >
-                Manual View
-              </button>
-              <button
-                className={`disassembly-dash__tab ${activeTab === 'tasks' ? 'disassembly-dash__tab--active' : ''}`}
-                onClick={() => setActiveTab('tasks')}
-              >
-                Task Breakdown
-              </button>
-            </div>
-          )}
-
-          <div style={{ display: showManualView ? 'block' : 'none' }}>
-            <ManualView cmmId={cmm.id} startPage={section.startPage} />
+          <div className="disassembly-dash__tabs">
+            <button
+              className={`disassembly-dash__tab ${activeTab === 'manual' ? 'disassembly-dash__tab--active' : ''}`}
+              onClick={() => setActiveTab('manual')}
+            >
+              Manual View
+            </button>
+            <button
+              className={`disassembly-dash__tab ${activeTab === 'tasks' ? 'disassembly-dash__tab--active' : ''}`}
+              onClick={() => setActiveTab('tasks')}
+            >
+              Task Breakdown
+            </button>
+            <button
+              className={`disassembly-dash__tab ${activeTab === 'detail' ? 'disassembly-dash__tab--active' : ''}`}
+              onClick={() => setActiveTab('detail')}
+              disabled={!selectedTask}
+            >
+              Task Detail
+            </button>
           </div>
 
-          {selectedTask ? (
-            <TaskDetail task={selectedTask} onBack={() => setSelectedTaskId(null)} />
-          ) : (
-            activeTab === 'tasks' && (
-              <TaskBreakdown tasks={result.tasks} onSelectTask={setSelectedTaskId} />
-            )
+          <div style={{ display: showManualView ? 'block' : 'none' }}>
+            <ManualView cmmId={cmm.id} page={manualPage} />
+          </div>
+
+          {activeTab === 'tasks' && (
+            <TaskBreakdown tasks={result.tasks} onSelectTask={handleSelectTask} />
+          )}
+
+          {activeTab === 'detail' && selectedTask && (
+            <TaskDetail task={selectedTask} onBack={handleBackFromDetail} />
           )}
         </>
       )}

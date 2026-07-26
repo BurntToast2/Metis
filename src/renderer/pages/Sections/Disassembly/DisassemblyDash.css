@@ -61,6 +61,7 @@
   display: flex;
   gap: 4px;
   border-bottom: 1px solid #e3e6ec;
+  flex-shrink: 0;
 }
 
 .disassembly-dash__tab {
@@ -77,4 +78,152 @@
 .disassembly-dash__tab--active {
   color: #0c1f3f;
   border-bottom-color: #c5a046;
+}
+
+.disassembly-dash__tab:disabled {
+  cursor: not-allowed;
+  color: #b7bdc7;
+  background-image: repeating-linear-gradient(
+    45deg,
+    #e3e6ec,
+    #e3e6ec 3px,
+    transparent 3px,
+    transparent 8px
+  );
+}
+
+.disassembly-manual-view {
+  resize: both;
+  overflow: auto;
+  min-width: 320px;
+  min-height: 400px;
+  height: 800px;
+  width: 100%;
+  flex: 1 1 auto;
+  max-width: 100%;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+}
+
+.disassembly-manual-view__embed {
+  width: 100%;
+  height: 100%;
+}
+
+.disassembly-task-breakdown__search {
+  width: 100%;
+  max-width: 400px;
+  padding: 10px 14px;
+  font-size: 14px;
+  border: 1.5px solid #d8dce3;
+  border-radius: 8px;
+  outline: none;
+  margin-bottom: 20px;
+}
+
+.disassembly-task-breakdown__search:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.disassembly-task-breakdown__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.disassembly-task-breakdown__empty {
+  color: #5a6472;
+  font-size: 14px;
+}
+
+.disassembly-task-card {
+  background: #ffffff;
+  border: 1px solid #e3e6ec;
+  border-radius: 4px;
+  border-top: 5px solid #c5a046;
+  padding: 16px;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(12, 31, 63, 0.06);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.disassembly-task-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(12, 31, 63, 0.1);
+}
+
+.disassembly-task-card__id {
+  font-size: 12px;
+  font-weight: 700;
+  color: #c5a046;
+  margin: 0 0 4px;
+  letter-spacing: 0.02em;
+}
+
+.disassembly-task-card__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0c1f3f;
+  margin: 0 0 10px;
+}
+
+.disassembly-task-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 12px;
+  color: #5a6472;
+}
+
+.disassembly-task-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+.disassembly-task-detail__title {
+  margin: 0;
+  color: #0c1f3f;
+}
+
+.disassembly-task-detail__subtasks ol {
+  margin: 8px 0 0;
+  padding-left: 20px;
+}
+
+.disassembly-task-detail__subtasks li {
+  margin-bottom: 6px;
+  color: #33394a;
+  font-size: 14px;
+}
+
+.disassembly-task-detail__empty {
+  color: #5a6472;
+  font-size: 14px;
+}
+
+.disassembly-task-detail__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.disassembly-task-detail__table th {
+  text-align: left;
+  background: #0c1f3f;
+  color: #ffffff;
+  padding: 10px 12px;
+  font-weight: 600;
+}
+
+.disassembly-task-detail__table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #eef0f3;
+  color: #33394a;
+}
+
+.disassembly-task-detail__table tr:nth-child(even) td {
+  background: #f9fafb;
 }

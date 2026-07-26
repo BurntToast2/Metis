@@ -61,6 +61,7 @@
   display: flex;
   gap: 4px;
   border-bottom: 1px solid #e3e6ec;
+  flex-shrink: 0;
 }
 
 .tfi-dash__tab {
@@ -79,13 +80,26 @@
   border-bottom-color: #c5a046;
 }
 
+.tfi-dash__tab:disabled {
+  cursor: not-allowed;
+  color: #b7bdc7;
+  background-image: repeating-linear-gradient(
+    45deg,
+    #e3e6ec,
+    #e3e6ec 3px,
+    transparent 3px,
+    transparent 8px
+  );
+}
+
 .tfi-manual-view {
   resize: both;
   overflow: auto;
   min-width: 320px;
   min-height: 400px;
+  height: 800px;
   width: 100%;
-  height: 600px;
+  flex: 1 1 auto;
   max-width: 100%;
   border: 1px solid #d0d5dd;
   border-radius: 8px;
@@ -166,6 +180,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  overflow-y: auto;
 }
 
 .tfi-task-detail__title {

@@ -5,12 +5,9 @@ interface TaskDetailProps {
   onBack: () => void;
 }
 
-export function TaskDetail({ task, onBack }: TaskDetailProps) {
+export function TaskDetail({ task }: TaskDetailProps) {
   return (
     <div className="tfi-task-detail">
-      <button className="tfi-dash__back" onClick={onBack}>
-        ← Back to Tasks
-      </button>
       <h3 className="tfi-task-detail__title">{task.id} — {task.title}</h3>
 
       {task.subTasks.length > 0 && (
