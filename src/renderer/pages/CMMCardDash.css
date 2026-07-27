@@ -179,13 +179,9 @@
   z-index: 1;
 }
 
-.cmm-card-dash__section-card--active {
-  border-top-color: #2563eb;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
-}
-
 .cmm-card-dash__section-card--extracted {
   background: linear-gradient(135deg, #f6e6c4 0%, #eef1f6 55%, #dbe2ee 100%);
+  border-top-color: #0c1f3f;
 }
 
 .cmm-card-dash__section-card--not-extracted {
