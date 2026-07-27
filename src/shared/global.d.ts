@@ -31,6 +31,7 @@ declare global {
       hasExtractedSection: (args: { cmmId: number; sectionId: string }) => Promise<boolean>;
       extractDisassemblyTools: (ref: SectionRef) => Promise<SectionExtractionResult>;
       extractCleaningTools: (ref: SectionRef) => Promise<SectionExtractionResult>;
+      extractInspectionTools: (ref: SectionRef) => Promise<SectionExtractionResult>;
       searchManuals: (query: string) => Promise<ManualSearchResult[]>;
     };
   }

@@ -11,6 +11,7 @@ import { registerExtractionStatusHandler } from './ipc/sections/extractionStatus
 import { registerDisassemblyHandlers } from './ipc/sections/disassembly/disassembly.handlers';
 import { registerSearchHandlers } from './ipc/search.handlers';
 import { registerCleaningHandlers } from './ipc/sections/cleaning/cleaning.handlers';
+import { registerInspectionHandlers } from './ipc/sections/inspection/inspection.handlers';
 
 if (started) {
   app.quit();
@@ -54,6 +55,7 @@ app.on('ready', () => {
   registerExtractionStatusHandler();
   registerSearchHandlers();
   registerCleaningHandlers();
+  registerInspectionHandlers();
   createWindow();
 });
 
