@@ -30,8 +30,8 @@ declare global {
       extractTestingTools: (ref: SectionRef) => Promise<SectionExtractionResult>;
       hasExtractedSection: (args: { cmmId: number; sectionId: string }) => Promise<boolean>;
       extractDisassemblyTools: (ref: SectionRef) => Promise<SectionExtractionResult>;
+      extractCleaningTools: (ref: SectionRef) => Promise<SectionExtractionResult>;
       searchManuals: (query: string) => Promise<ManualSearchResult[]>;
     };
   }
 }
-

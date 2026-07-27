@@ -4,6 +4,7 @@ import { CMMRecord } from '../../shared/types/cmm';
 import { SectionRef, SectionExtractionResult } from '../../shared/types/sections';
 import { TestingFaultIsolationDash } from './Sections/Testing/TestingFaultIsolationDash';
 import { DisassemblyDash } from './Sections/Disassembly/DisassemblyDash';
+import { CleaningDash } from './Sections/Cleaning/CleaningDash';
 import { CMMViewer } from '../components/CMMViewer';
 import './CMMCardDash.css';
 
@@ -20,11 +21,12 @@ interface CMMCardDashProps {
   onBack: () => void;
 }
 
-const TASK_ENABLED_SECTIONS = ['testing-fault-isolation', 'disassembly'];
+const TASK_ENABLED_SECTIONS = ['testing-fault-isolation', 'disassembly', 'cleaning'];
 
 const SECTION_EXTRACTORS: Record<string, (ref: SectionRef) => Promise<SectionExtractionResult>> = {
   'testing-fault-isolation': window.api.extractTestingTools,
   disassembly: window.api.extractDisassemblyTools,
+  cleaning: window.api.extractCleaningTools,
 };
 
 function sectionLabel(sectionId: string): string {
@@ -40,6 +42,8 @@ function renderSectionDash(cmm: CMMRecord, section: CMMSection, onBack: () => vo
       return <TestingFaultIsolationDash cmm={cmm} section={section} onBack={onBack} />;
     case 'disassembly':
       return <DisassemblyDash cmm={cmm} section={section} onBack={onBack} />;
+    case 'cleaning':
+      return <CleaningDash cmm={cmm} section={section} onBack={onBack} />;
     default:
       return null;
   }

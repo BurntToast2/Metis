@@ -43,6 +43,8 @@ contextBridge.exposeInMainWorld('api', {
   ipcRenderer.invoke('has-extracted-section', args),
   extractDisassemblyTools: (payload: SectionRef): Promise<SectionExtractionResult> =>
     ipcRenderer.invoke('disassembly:extractTools', payload),
+  extractCleaningTools: (payload: SectionRef): Promise<SectionExtractionResult> =>
+    ipcRenderer.invoke('cleaning:extractTools', payload),
   searchManuals: (query: string): Promise<ManualSearchResult[]> =>
     ipcRenderer.invoke('search:manuals', query),
 });
