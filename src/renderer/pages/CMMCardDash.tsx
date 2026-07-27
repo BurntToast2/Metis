@@ -22,6 +22,11 @@ interface CMMCardDashProps {
   onBack: () => void;
 }
 
+interface OpenTask {
+  section: CMMSection;
+  result: SectionExtractionResult;
+}
+
 const TASK_ENABLED_SECTIONS = ['testing-fault-isolation', 'disassembly', 'cleaning', 'inspection-check'];
 
 const SECTION_EXTRACTORS: Record<string, (ref: SectionRef) => Promise<SectionExtractionResult>> = {
@@ -38,16 +43,25 @@ function sectionLabel(sectionId: string): string {
     .join(' ');
 }
 
-function renderSectionDash(cmm: CMMRecord, section: CMMSection, onBack: () => void) {
+// Dash components now receive the already-fetched result directly — they no
+// longer call the extractor themselves. This avoids a redundant IPC round
+// trip (and the accompanying plain-spinner flash) immediately after
+// CMMCardDash has just fetched the same result to decide whether to open
+// the section at all.
+function renderSectionDash(
+  cmm: CMMRecord,
+  { section, result }: OpenTask,
+  onBack: () => void,
+) {
   switch (section.sectionId) {
     case 'testing-fault-isolation':
-      return <TestingFaultIsolationDash cmm={cmm} section={section} onBack={onBack} />;
+      return <TestingFaultIsolationDash cmm={cmm} section={section} result={result} onBack={onBack} />;
     case 'disassembly':
-      return <DisassemblyDash cmm={cmm} section={section} onBack={onBack} />;
+      return <DisassemblyDash cmm={cmm} section={section} result={result} onBack={onBack} />;
     case 'cleaning':
-      return <CleaningDash cmm={cmm} section={section} onBack={onBack} />;
+      return <CleaningDash cmm={cmm} section={section} result={result} onBack={onBack} />;
     case 'inspection-check':
-      return <InspectionDash cmm={cmm} section={section} onBack={onBack} />;
+      return <InspectionDash cmm={cmm} section={section} result={result} onBack={onBack} />;
     default:
       return null;
   }
@@ -59,10 +73,11 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [previewsReady, setPreviewsReady] = useState(false);
-  const [openTaskSection, setOpenTaskSection] = useState<CMMSection | null>(null);
+  const [openTask, setOpenTask] = useState<OpenTask | null>(null);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [extractionStatus, setExtractionStatus] = useState<Record<string, boolean>>({});
   const [extractingSectionId, setExtractingSectionId] = useState<string | null>(null);
+  const [openErrorSectionId, setOpenErrorSectionId] = useState<string | null>(null);
 
   useEffect(() => {
     setIsLoading(true);
@@ -108,33 +123,46 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
       return;
     }
 
-    if (extractionStatus[section.sectionId]) {
-      setOpenTaskSection(section);
-      return;
-    }
-
     const extractor = SECTION_EXTRACTORS[section.sectionId];
     if (!extractor) {
       console.error(`No extractor registered for section "${section.sectionId}"`);
       return;
     }
 
+    setOpenErrorSectionId(null);
+
+    // Already extracted (from this session or a previous one) — no
+    // "extracting" card animation needed, but we still need the actual
+    // result in hand before opening the dash, since it's a cache hit on
+    // disk rather than something already sitting in this component's state.
+    if (extractionStatus[section.sectionId]) {
+      try {
+        const result = await extractor({ cmmId: cmm.id, sectionId: section.sectionId });
+        setOpenTask({ section, result });
+      } catch (err) {
+        console.error(`fetch of cached extraction failed for "${section.sectionId}":`, err);
+        setOpenErrorSectionId(section.sectionId);
+      }
+      return;
+    }
+
     setExtractingSectionId(section.sectionId);
     try {
-      await extractor({ cmmId: cmm.id, sectionId: section.sectionId });
+      const result = await extractor({ cmmId: cmm.id, sectionId: section.sectionId });
       setExtractionStatus((prev) => ({ ...prev, [section.sectionId]: true }));
-      setOpenTaskSection(section);
+      setOpenTask({ section, result });
     } catch (err) {
       console.error(`extraction failed for "${section.sectionId}":`, err);
+      setOpenErrorSectionId(section.sectionId);
     } finally {
       setExtractingSectionId(null);
     }
   }
 
-  if (openTaskSection) {
+  if (openTask) {
     return (
       <div className="cmm-card-dash">
-        {renderSectionDash(cmm, openTaskSection, () => setOpenTaskSection(null))}
+        {renderSectionDash(cmm, openTask, () => setOpenTask(null))}
       </div>
     );
   }
@@ -228,6 +256,7 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
               const extractionKnown = section.sectionId in extractionStatus;
               const isExtracted = extractionStatus[section.sectionId];
               const isExtracting = extractingSectionId === section.sectionId;
+              const hasError = openErrorSectionId === section.sectionId;
 
               return (
                 <motion.div
@@ -273,6 +302,11 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
                   </p>
                   {isExtracting && (
                     <p className="cmm-card-dash__section-status">Extracting…</p>
+                  )}
+                  {hasError && (
+                    <p className="cmm-card-dash__section-status cmm-card-dash__section-status--error">
+                      Failed to load — try again
+                    </p>
                   )}
                 </motion.div>
               );

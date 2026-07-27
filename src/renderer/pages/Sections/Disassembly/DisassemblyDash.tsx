@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { CMMRecord } from '../../../../shared/types/cmm';
 import { Task, SectionExtractionResult } from '../../../../shared/types/sections';
 import { ManualView } from '../Shared/ManualView';
@@ -16,36 +16,29 @@ interface CMMSection {
 interface DisassemblyDashProps {
   cmm: CMMRecord;
   section: CMMSection;
+  result: SectionExtractionResult;
   onBack: () => void;
 }
 
 type Tab = 'manual' | 'tasks' | 'detail';
 
-export function DisassemblyDash({ cmm, section, onBack }: DisassemblyDashProps) {
-  const [result, setResult] = useState<SectionExtractionResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+// This component no longer fetches its own data — CMMCardDash already has
+// the extraction result in hand (it had to fetch it anyway to decide
+// whether the section was extracted before opening this dash) and passes
+// it straight in as `result`. That removes a second, redundant IPC round
+// trip immediately after the one CMMCardDash already made, and the plain
+// loading-spinner flash that came with it.
+export function DisassemblyDash({ cmm, section, result, onBack }: DisassemblyDashProps) {
   const [activeTab, setActiveTab] = useState<Tab>('manual');
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [manualPage, setManualPage] = useState(section.startPage);
 
-  useEffect(() => {
-    setIsLoading(true);
-    setError(null);
-    window.api.extractDisassemblyTools({ cmmId: cmm.id, sectionId: section.sectionId })
-      .then(setResult)
-      .catch((err) => {
-        console.error('extractDisassemblyTools failed:', err);
-        setError('Failed to extract task data for this section.');
-      })
-      .finally(() => setIsLoading(false));
-  }, [cmm.id, section.sectionId]);
-
-  const selectedTask: Task | null =
-    result && selectedTaskId ? result.tasks.find((t) => t.id === selectedTaskId) ?? null : null;
+  const selectedTask: Task | null = selectedTaskId
+    ? result.tasks.find((t) => t.id === selectedTaskId) ?? null
+    : null;
 
   function handleSelectTask(taskId: string) {
-    const task = result?.tasks.find((t) => t.id === taskId);
+    const task = result.tasks.find((t) => t.id === taskId);
     setSelectedTaskId(taskId);
     if (task) {
       setManualPage(task.sourcePage);
@@ -57,7 +50,7 @@ export function DisassemblyDash({ cmm, section, onBack }: DisassemblyDashProps) 
     setActiveTab('tasks');
   }
 
-  const showManualView = Boolean(result) && activeTab === 'manual';
+  const showManualView = activeTab === 'manual';
 
   return (
     <div className="disassembly-dash">
@@ -68,51 +61,38 @@ export function DisassemblyDash({ cmm, section, onBack }: DisassemblyDashProps) 
         <h2 className="disassembly-dash__title">Disassembly</h2>
       </div>
 
-      {isLoading ? (
-        <div className="disassembly-dash__loading">
-          <div className="disassembly-dash__spinner" />
-          <p>Extracting tasks and tools — this may take a moment on first open…</p>
-        </div>
-      ) : error ? (
-        <p className="disassembly-dash__error">{error}</p>
-      ) : null}
+      <div className="disassembly-dash__tabs">
+        <button
+          className={`disassembly-dash__tab ${activeTab === 'manual' ? 'disassembly-dash__tab--active' : ''}`}
+          onClick={() => setActiveTab('manual')}
+        >
+          Manual View
+        </button>
+        <button
+          className={`disassembly-dash__tab ${activeTab === 'tasks' ? 'disassembly-dash__tab--active' : ''}`}
+          onClick={() => setActiveTab('tasks')}
+        >
+          Task Breakdown
+        </button>
+        <button
+          className={`disassembly-dash__tab ${activeTab === 'detail' ? 'disassembly-dash__tab--active' : ''}`}
+          onClick={() => setActiveTab('detail')}
+          disabled={!selectedTask}
+        >
+          Task Detail
+        </button>
+      </div>
 
-      {result && (
-        <>
-          <div className="disassembly-dash__tabs">
-            <button
-              className={`disassembly-dash__tab ${activeTab === 'manual' ? 'disassembly-dash__tab--active' : ''}`}
-              onClick={() => setActiveTab('manual')}
-            >
-              Manual View
-            </button>
-            <button
-              className={`disassembly-dash__tab ${activeTab === 'tasks' ? 'disassembly-dash__tab--active' : ''}`}
-              onClick={() => setActiveTab('tasks')}
-            >
-              Task Breakdown
-            </button>
-            <button
-              className={`disassembly-dash__tab ${activeTab === 'detail' ? 'disassembly-dash__tab--active' : ''}`}
-              onClick={() => setActiveTab('detail')}
-              disabled={!selectedTask}
-            >
-              Task Detail
-            </button>
-          </div>
+      <div style={{ display: showManualView ? 'block' : 'none' }}>
+        <ManualView cmmId={cmm.id} page={manualPage} />
+      </div>
 
-          <div style={{ display: showManualView ? 'block' : 'none' }}>
-            <ManualView cmmId={cmm.id} page={manualPage} />
-          </div>
+      {activeTab === 'tasks' && (
+        <TaskBreakdown tasks={result.tasks} onSelectTask={handleSelectTask} />
+      )}
 
-          {activeTab === 'tasks' && (
-            <TaskBreakdown tasks={result.tasks} onSelectTask={handleSelectTask} />
-          )}
-
-          {activeTab === 'detail' && selectedTask && (
-            <TaskDetail task={selectedTask} onBack={handleBackFromDetail} />
-          )}
-        </>
+      {activeTab === 'detail' && selectedTask && (
+        <TaskDetail task={selectedTask} onBack={handleBackFromDetail} />
       )}
     </div>
   );
