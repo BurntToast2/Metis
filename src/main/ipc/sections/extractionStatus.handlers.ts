@@ -7,6 +7,7 @@ const SECTION_EXTRACTION_KIND: Record<string, string> = {
   'disassembly': 'disassembly',
   'cleaning': 'cleaning',
   'inspection-check': 'inspection',
+  'repairs': 'repairs',
 };
 
 export function registerExtractionStatusHandler() {

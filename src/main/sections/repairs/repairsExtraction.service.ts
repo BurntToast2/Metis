@@ -3,11 +3,11 @@ import path from 'path';
 import { findReferencedSections } from '../common/referenceExtraction';
 import { extractTasksAndTools } from '../common/taskExtraction';
 import {
-  buildInspectionReferenceFinderSystemPrompt,
-  buildInspectionReferenceFinderUserPrompt,
-  buildInspectionTaskExtractionSystemPrompt,
-  buildInspectionTaskExtractionUserPrompt,
-} from '../../prompts/inspectionExtraction.prompts';
+  buildRepairsReferenceFinderSystemPrompt,
+  buildRepairsReferenceFinderUserPrompt,
+  buildRepairsTaskExtractionSystemPrompt,
+  buildRepairsTaskExtractionUserPrompt,
+} from '../../prompts/repairsExtraction.prompts';
 import type { SectionRef, SectionExtractionResult } from '../common/section.types';
 import { loadCmmTextIndex, getSectionContent } from '../../storage/CMMSectionContent';
 import { getCmmExtractedSectionPath } from '../../storage/CMMPaths';
@@ -16,54 +16,53 @@ async function readExistingResult(
   cmmId: number,
   sectionId: string,
 ): Promise<SectionExtractionResult | null> {
-  const outPath = getCmmExtractedSectionPath(cmmId, 'inspection', sectionId);
+  const outPath = getCmmExtractedSectionPath(cmmId, 'repairs', sectionId);
   try {
     const raw = await readFile(outPath, 'utf-8');
     return JSON.parse(raw) as SectionExtractionResult;
   } catch (err) {
     if ((err as NodeJS.ErrnoException).code !== 'ENOENT') {
-      console.warn('[inspectionExtraction] existing result unreadable, re-extracting:', err);
+      console.warn('[repairsExtraction] existing result unreadable, re-extracting:', err);
     }
     return null;
   }
 }
 
 async function saveExtractionResult(result: SectionExtractionResult): Promise<void> {
-  const outPath = getCmmExtractedSectionPath(result.cmmId, 'inspection', result.sectionId);
+  const outPath = getCmmExtractedSectionPath(result.cmmId, 'repairs', result.sectionId);
   await mkdir(path.dirname(outPath), { recursive: true });
   await writeFile(outPath, JSON.stringify(result, null, 2), 'utf-8');
 }
 
-export async function runInspectionExtraction({
+export async function runRepairsExtraction({
   cmmId,
   sectionId,
 }: SectionRef): Promise<SectionExtractionResult> {
-  // Skip the whole pipeline if we've already extracted this section before.
   const existing = await readExistingResult(cmmId, sectionId);
   if (existing) {
     return existing;
   }
 
-  // Step 1: LLM call #1 
+  // Step 1: LLM call #1
   const index = await loadCmmTextIndex(cmmId);
-  const inspectionSectionContent = getSectionContent(index, sectionId);
+  const repairsSectionContent = getSectionContent(index, sectionId);
 
   const validSectionIds = index.sections
     .map((s) => s.sectionId)
     .filter((id) => id !== sectionId);
 
   const { referencedSections: rawReferencedSections } = await findReferencedSections(
-    inspectionSectionContent,
+    repairsSectionContent,
     validSectionIds,
-    buildInspectionReferenceFinderSystemPrompt,
-    buildInspectionReferenceFinderUserPrompt,
+    buildRepairsReferenceFinderSystemPrompt,
+    buildRepairsReferenceFinderUserPrompt,
   );
 
   const modelReferencedSections = rawReferencedSections.filter((ref) => {
     const isValid = validSectionIds.includes(ref.sectionId);
     if (!isValid) {
       console.warn(
-        `[inspectionExtraction] dropping unresolvable referenced section "${ref.sectionId}"`,
+        `[repairsExtraction] dropping unresolvable referenced section "${ref.sectionId}"`,
       );
     }
     return isValid;
@@ -88,10 +87,10 @@ export async function runInspectionExtraction({
 
   // Step 3: LLM call #2 
   const { tasks } = await extractTasksAndTools(
-    inspectionSectionContent,
+    repairsSectionContent,
     referencedContents,
-    buildInspectionTaskExtractionSystemPrompt,
-    buildInspectionTaskExtractionUserPrompt,
+    buildRepairsTaskExtractionSystemPrompt,
+    buildRepairsTaskExtractionUserPrompt,
   );
 
   const result: SectionExtractionResult = {

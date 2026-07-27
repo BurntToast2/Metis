@@ -12,6 +12,7 @@ import { registerDisassemblyHandlers } from './ipc/sections/disassembly/disassem
 import { registerSearchHandlers } from './ipc/search.handlers';
 import { registerCleaningHandlers } from './ipc/sections/cleaning/cleaning.handlers';
 import { registerInspectionHandlers } from './ipc/sections/inspection/inspection.handlers';
+import { registerRepairsHandlers } from './ipc/sections/repairs/repairs.handlers';
 
 if (started) {
   app.quit();
@@ -56,6 +57,7 @@ app.on('ready', () => {
   registerSearchHandlers();
   registerCleaningHandlers();
   registerInspectionHandlers();
+  registerRepairsHandlers();
   createWindow();
 });
 
