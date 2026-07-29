@@ -39,7 +39,6 @@ export async function runInspectionExtraction({
   cmmId,
   sectionId,
 }: SectionRef): Promise<SectionExtractionResult> {
-  // Skip the whole pipeline if we've already extracted this section before.
   const existing = await readExistingResult(cmmId, sectionId);
   if (existing) {
     return existing;

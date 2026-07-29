@@ -1,4 +1,3 @@
-// CleaningDash.tsx
 import { useState } from 'react';
 import { CMMRecord } from '../../../../shared/types/cmm';
 import { Task, SectionExtractionResult } from '../../../../shared/types/sections';
@@ -23,8 +22,6 @@ interface CleaningDashProps {
 
 type Tab = 'manual' | 'tasks' | 'detail';
 
-// Same change as InspectionDash: result is now passed in by CMMCardDash
-// rather than fetched here, removing a redundant IPC round trip.
 export function CleaningDash({ cmm, section, result, onBack }: CleaningDashProps) {
   const [activeTab, setActiveTab] = useState<Tab>('manual');
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);

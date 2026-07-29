@@ -39,16 +39,12 @@ export async function runTestingExtraction({
   cmmId,
   sectionId,
 }: SectionRef): Promise<SectionExtractionResult> {
-  // Skip the whole pipeline if we've already extracted this section before.
   const existing = await readExistingResult(cmmId, sectionId);
   if (existing) {
     return existing;
   }
 
-  // Step 1: LLM call #1 — send only the testing section, get back which other
-  // sections it references. Constrained to section IDs that actually exist
-  // in this CMM's sections.json, so it can't report something (a table, a
-  // figure) that step 2 has no way to resolve.
+  // Step 1: LLM call #1 
   const index = await loadCmmTextIndex(cmmId);
   const testingSectionContent = getSectionContent(index, sectionId);
 
@@ -84,14 +80,13 @@ export async function runTestingExtraction({
   ]);
   const referencedSections = [...referencedSectionIdSet].map((id) => ({ sectionId: id }));
 
-  // Step 2: no LLM involved — resolve each referenced section's pages from sections.json, then pull its actual text out of raw-text.json.
+  // Step 2: no LLM involved 
   const referencedContents = referencedSections.map((ref) => ({
     sectionId: ref.sectionId,
     content: getSectionContent(index, ref.sectionId),
   }));
 
-  // Step 3: LLM call #2 — testing section + referenced sections' text together,
-  // split into tasks (with lightweight sub-tasks, detailed tools/consumables).
+  // Step 3: LLM call #2 
   const { tasks } = await extractTasksAndTools(
     testingSectionContent,
     referencedContents,

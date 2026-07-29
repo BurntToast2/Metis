@@ -27,34 +27,18 @@ export const cmms = pgTable('cmms', {
   uploadedAt: timestamp('uploaded_at').defaultNow(),
   // Aircraft applicability, e.g. "737-800". Extracted the same way as
   // cmmNumber/manufacturer (one more field in buildMetadataPrompt), left
-  // nullable since not every CMM's front matter states it clearly. Only
-  // consulted when building a key for a platform-scoped manual type
-  // (SRM/AMM/NTM) — everything else ignores it.
+  // nullable since not every CMM's front matter states it clearly.
   platform: text('platform'),
 });
 
-// Pointer row only, matching the cmms convention — the actual PDF,
-// raw-text.json, and this manual's own sections.json (its chapter map,
-// with open-ended sectionIds rather than your 14 known CMM section IDs)
-// all live on disk under storage/reference-manuals/{id}/, resolved via
-// filePath the same way getCmmFolderPath resolves a CMM's folder.
 export const referenceManuals = pgTable('reference_manuals', {
   id: serial('id').primaryKey(),
   manualType: externalManualTypeEnum('manual_type').notNull(),
-  // Null for manual types that aren't airframe-specific (SOPM, SPEC, CMM
-  // cross-refs) — those are scoped as "generic" rather than by platform.
   platform: text('platform'),
   filePath: text('file_path'),
   ingestedAt: timestamp('ingested_at').defaultNow(),
 });
 
-// One row per distinct cited key, deduplicated across every CMM that
-// cites it. rawDocNumber is kept alongside normalizedKey purely for
-// display/debugging — normalizedKey is the only thing ever queried on.
-// resolvedSectionId/StartPage/EndPage are a cached copy of a row that
-// also exists in the resolved manual's own sections.json — kept here so a
-// resolved lookup never needs to open that file, at the cost of needing
-// both kept in sync if a manual is ever re-classified.
 export const externalReferences = pgTable(
   'external_references',
   {
@@ -75,12 +59,6 @@ export const externalReferences = pgTable(
   }),
 );
 
-// Join table linking a specific task (inside a specific CMM's section) to
-// the keys it needs. taskId is a plain string, not a foreign key, because
-// tasks don't live as DB rows — they live inside the JSON file written by
-// runXExtraction (extractedSections/{sectionId}/{sectionId}.json). This
-// table is the only place a task's identity is known to the database at
-// all; everything else about the task stays on disk.
 export const taskReferenceLinks = pgTable(
   'task_reference_links',
   {

@@ -29,12 +29,6 @@ function getSectionSnippet(rawText: PageText[], section: SectionRange, wordsPerE
   return words.slice(0, wordsPerEnd).join(' ');
 }
 
-/**
- * Deterministic prefix match — free, exact, no LLM call. Tries the full
- * citation first, then progressively coarser prefixes ("53-30-01" ->
- * "53-30" -> "53"), since a citation can be more granular than whatever
- * running header the manual's own page-classifier happened to resolve.
- */
 function resolveByPrefixMatch(rawDocNumber: string, sections: SectionRange[]): SectionRange | null {
   const citationSegments = normalizeDocNumber(rawDocNumber).split('-');
   const normalizedSections = sections.map((s) => ({
@@ -50,11 +44,6 @@ function resolveByPrefixMatch(rawDocNumber: string, sections: SectionRange[]): S
   return null;
 }
 
-/**
- * LLM fallback — only reached when prefix matching finds nothing. Closed-
- * set pick from a list, not open retrieval: it either names one of the
- * given sectionIds or returns null, never invents an answer.
- */
 async function resolveByLLMPick(
   manualType: string,
   rawDocNumber: string,
@@ -110,13 +99,6 @@ async function attemptResolve(
   return resolveByLLMPick(manualType, rawDocNumber, sections, rawText);
 }
 
-/**
- * Runs right after a manual is ingested — finds every still-pending
- * citation matching this manual's type (and platform, if scoped) and
- * attempts to resolve each against it. One upload can satisfy citations
- * registered by many different CMMs at once, since external_references is
- * deduplicated across the whole library rather than per-CMM.
- */
 export async function resolvePendingReferencesForManual(manualId: number): Promise<void> {
   const [manual] = await db.select().from(referenceManuals).where(eq(referenceManuals.id, manualId));
   if (!manual) return;
@@ -147,12 +129,6 @@ export async function resolvePendingReferencesForManual(manualId: number): Promi
   }
 }
 
-/**
- * Runs right after a brand-new citation is registered — checks whether
- * any manual already sitting in the common store (matching type and
- * platform) can satisfy it immediately, so the second CMM to cite an
- * already-uploaded manual never shows a missing-reference card at all.
- */
 export async function tryResolveAgainstExistingManuals(externalReferenceId: number): Promise<void> {
   const [ref] = await db
     .select()
@@ -175,7 +151,7 @@ export async function tryResolveAgainstExistingManuals(externalReferenceId: numb
     const match = await attemptResolve(manual.id, ref.rawDocNumber, ref.manualType, sections);
     if (match) {
       await markResolved(ref.id, manual.id, match);
-      return; // resolved — no need to check remaining candidate manuals
+      return; 
     }
   }
 }

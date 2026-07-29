@@ -22,12 +22,6 @@ interface DisassemblyDashProps {
 
 type Tab = 'manual' | 'tasks' | 'detail';
 
-// This component no longer fetches its own data — CMMCardDash already has
-// the extraction result in hand (it had to fetch it anyway to decide
-// whether the section was extracted before opening this dash) and passes
-// it straight in as `result`. That removes a second, redundant IPC round
-// trip immediately after the one CMMCardDash already made, and the plain
-// loading-spinner flash that came with it.
 export function DisassemblyDash({ cmm, section, result, onBack }: DisassemblyDashProps) {
   const [activeTab, setActiveTab] = useState<Tab>('manual');
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);

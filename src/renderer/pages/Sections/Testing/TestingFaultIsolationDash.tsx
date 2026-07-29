@@ -22,8 +22,6 @@ interface TestingFaultIsolationDashProps {
 
 type Tab = 'manual' | 'tasks' | 'detail';
 
-// Same change as the other section dashes: result is now passed in by
-// CMMCardDash rather than fetched here, removing a redundant IPC round trip.
 export function TestingFaultIsolationDash({ cmm, section, result, onBack }: TestingFaultIsolationDashProps) {
   const [activeTab, setActiveTab] = useState<Tab>('manual');
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);

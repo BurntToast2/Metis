@@ -48,9 +48,6 @@ interface CmmMetadata {
   revision: string | null;
   revisionDate: string | null;
   summary: string;
-  // Aircraft applicability, e.g. "737-800". Used later to disambiguate
-  // platform-scoped external references (SRM/AMM/NTM) that reuse the same
-  // ATA chapter numbers across different aircraft types.
   platform: string | null;
 }
 

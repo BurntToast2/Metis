@@ -17,11 +17,6 @@ export interface CmmTextIndex {
   rawTextByPage: Map<number, string>;
 }
 
-/**
- * Reads sections.json + raw-text.json for a CMM once. Load this a single time
- * per extraction run, then resolve as many sections against it as needed (the
- * testing section plus however many referenced sections) with no further disk I/O.
- */
 export async function loadCmmTextIndex(cmmId: number): Promise<CmmTextIndex> {
   const [sectionsRaw, rawTextRaw] = await Promise.all([
     readFile(getCmmSectionsPath(cmmId), 'utf-8'),

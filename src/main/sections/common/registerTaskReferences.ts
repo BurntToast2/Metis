@@ -1,4 +1,4 @@
-import { eq, and } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { db } from '../../db';
 import { cmms, externalReferences, taskReferenceLinks } from '../../db/schema';
 import type { Task } from '../../../shared/types/sections';
@@ -9,12 +9,6 @@ import {
 } from '../../common/referenceKey';
 import { tryResolveAgainstExistingManuals } from '../referenceManuals/referenceResolution.service';
 
-/**
- * Finds the existing external_references row for this key, or creates one
- * as 'pending'. Returns the row either way, plus whether it was newly
- * created — resolution is only worth attempting on a fresh row, since an
- * existing row was already attempted when it was first registered.
- */
 async function findOrCreateExternalReference(
   normalizedKey: string,
   manualType: string,
@@ -33,7 +27,7 @@ async function findOrCreateExternalReference(
   const [inserted] = await db
     .insert(externalReferences)
     .values({
-      manualType: manualType as never, // enum-typed column, validated upstream by the extraction prompt's fixed manualType list
+      manualType: manualType as never, 
       platform,
       rawDocNumber,
       normalizedKey,
@@ -42,8 +36,6 @@ async function findOrCreateExternalReference(
     .onConflictDoNothing({ target: externalReferences.normalizedKey })
     .returning({ id: externalReferences.id });
 
-  // Lost the race against a concurrent insert of the same key — the row
-  // exists now even though our insert above didn't create it.
   if (!inserted) {
     const [raceWinner] = await db
       .select({ id: externalReferences.id })
@@ -74,18 +66,7 @@ async function linkTaskToReference(
     });
 }
 
-/**
- * Called once per task, right after a section's task-extraction LLM call
- * returns. Registers every externalReferences entry the model found on
- * that task: builds its canonical key, upserts the shared registry row
- * (deduplicated across the whole library), links this specific task to
- * it, and — only for a brand-new key — checks whether an already-uploaded
- * manual can satisfy it immediately.
- *
- * Never throws on an individual reference's failure; one malformed
- * citation shouldn't take down the whole extraction result that's about
- * to be cached to disk.
- */
+
 export async function registerTaskReferences(
   cmmId: number,
   sectionId: string,

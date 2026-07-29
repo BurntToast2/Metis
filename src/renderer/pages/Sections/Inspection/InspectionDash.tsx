@@ -1,9 +1,4 @@
-<<<<<<< HEAD
-import { useState, useEffect } from 'react';
-=======
-// InspectionDash.tsx
 import { useState } from 'react';
->>>>>>> 2013387 (Updated extracting screen with error handling)
 import { CMMRecord } from '../../../../shared/types/cmm';
 import { Task, SectionExtractionResult } from '../../../../shared/types/sections';
 import { ManualView } from '../Shared/ManualView';
@@ -27,12 +22,6 @@ interface InspectionDashProps {
 
 type Tab = 'manual' | 'tasks' | 'detail';
 
-// This component no longer fetches its own data — CMMCardDash already has
-// the extraction result in hand (it had to fetch it anyway to decide
-// whether the section was extracted before opening this dash) and passes
-// it straight in as `result`. That removes a second, redundant IPC round
-// trip immediately after the one CMMCardDash already made, and the plain
-// loading-spinner flash that came with it.
 export function InspectionDash({ cmm, section, result, onBack }: InspectionDashProps) {
   const [activeTab, setActiveTab] = useState<Tab>('manual');
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
@@ -55,17 +44,6 @@ export function InspectionDash({ cmm, section, result, onBack }: InspectionDashP
     setActiveTab('tasks');
   }
 
-  // ManualView wraps a native <embed> PDF viewer — its scroll/zoom/page state
-  // lives inside the browser plugin instance, invisible to React. Unmounting
-  // it (e.g. via a ternary keyed on activeTab or selectedTask) destroys that
-  // instance, and any later remount reloads the PDF from scratch. So it's
-  // mounted once, here, unconditionally, and visibility is toggled with CSS
-  // instead of conditional rendering — the DOM node (and the plugin
-  // underneath it) never goes away for the lifetime of this component.
-  // Page navigation (jumping to a task's sourcePage) is handled separately via
-  // the `key={page}` on the underlying <embed> in ManualView, which forces a
-  // fresh load at the target page — this is an intentional exception to the
-  // "never remount" rule above, since jumping pages is expected to reset scroll.
   const showManualView = activeTab === 'manual';
 
   return (

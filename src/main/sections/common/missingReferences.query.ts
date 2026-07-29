@@ -3,13 +3,6 @@ import { db } from '../../db';
 import { taskReferenceLinks, externalReferences } from '../../db/schema';
 import type { MissingReference } from '../../../shared/types/referenceManuals';
 
-/**
- * Every still-pending external reference cited by any task in this
- * section, grouped by key — one card per key, listing which tasks in
- * this section need it. Deliberately scoped to a single section rather
- * than the whole CMM, since that's what the task-breakdown page actually
- * renders.
- */
 export async function getMissingReferencesForSection(
   cmmId: number,
   sectionId: string,
@@ -51,11 +44,6 @@ export async function getMissingReferencesForSection(
   return [...byKey.values()];
 }
 
-/**
- * Cheap per-task check used right after a re-extraction becomes possible
- * (or to decide whether to show a "ready" state on a task card) — true
- * only once every reference that specific task cited is resolved.
- */
 export async function isTaskFullyResolved(
   cmmId: number,
   sectionId: string,

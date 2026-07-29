@@ -18,11 +18,6 @@ function buildSnippet(text: string, matchIndex: number, matchLength: number): st
   return `${prefix}${text.slice(start, end).trim()}${suffix}`;
 }
 
-/**
- * Storage has no DB to query for the list of CMMs — each CMM's folder name
- * under storage/cmms/ IS its id. Discover them by listing that directory
- * rather than querying a database.
- */
 async function listAllCmmIds(): Promise<number[]> {
   const storageRoot = path.dirname(getCmmFolderPath(0));
 
@@ -44,10 +39,6 @@ interface CmmDisplayInfo {
   cmmNumber: string | null;
 }
 
-/**
- * summary.json can be either a plain string or a record of fields (mirrors
- * the CMMSummary union already used in CMMCardDash.tsx).
- */
 async function readCmmDisplayInfo(id: number): Promise<CmmDisplayInfo> {
   try {
     const raw = await fs.readFile(getCmmSummaryPath(id), 'utf-8');

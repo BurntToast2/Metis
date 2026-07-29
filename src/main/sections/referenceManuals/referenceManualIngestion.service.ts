@@ -27,8 +27,6 @@ import { resolvePendingReferencesForManual } from './referenceResolution.service
 export interface IngestReferenceManualParams {
   uploadedFilePath: string;
   manualType: ExternalManualType;
-  // Only stored for platform-scoped types (SRM/AMM/NTM) — silently
-  // dropped for generic types (SOPM/SPEC/CMM) even if supplied.
   platform?: string | null;
 }
 
@@ -54,10 +52,6 @@ export async function ingestReferenceManual({
 
   const fullTextPages = await extractPdfTextRange(uploadedFilePath, 1, totalPages);
 
-  // Normalized before storage — this is the same string that
-  // resolvePendingReferencesForManual's equality-based lookup compares
-  // against external_references.platform, so both sides must agree on
-  // casing/whitespace or valid matches will silently be missed.
   const storedPlatform = isPlatformScoped(manualType) && platform ? normalizePlatform(platform) : null;
 
   const [inserted] = await db
@@ -79,9 +73,6 @@ export async function ingestReferenceManual({
 
   await db.update(referenceManuals).set({ filePath: folderPath }).where(eq(referenceManuals.id, id));
 
-  // Resolve every pending citation this manual can satisfy immediately —
-  // may unblock tasks in CMMs that were sitting on missing-reference
-  // cards well before this upload happened.
   await resolvePendingReferencesForManual(id);
 
   return { id };

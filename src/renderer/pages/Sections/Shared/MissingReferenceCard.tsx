@@ -22,8 +22,6 @@ export function MissingReferenceCard({ reference, onUploaded }: MissingReference
       await window.api.uploadReferenceManual({
         filePath,
         manualType: reference.manualType,
-        // Reused exactly as stored — never re-derived here, so the
-        // uploaded manual's platform matches this citation's key.
         platform: reference.platform,
       });
       onUploaded();

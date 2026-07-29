@@ -17,8 +17,6 @@ export function TaskBreakdown({ cmmId, sectionId, tasks: initialTasks, onSelectT
   const [tasks, setTasks] = useState(initialTasks);
   const [missingReferences, setMissingReferences] = useState<MissingReference[]>([]);
 
-  // Keeps this component's own copy in sync if the parent ever remounts it
-  // with a fresh result (e.g. reopening the section fetched a newer cache).
   useEffect(() => {
     setTasks(initialTasks);
   }, [initialTasks]);
@@ -30,14 +28,6 @@ export function TaskBreakdown({ cmmId, sectionId, tasks: initialTasks, onSelectT
       .catch((err) => console.error('getMissingReferences failed:', err));
   }, [cmmId, sectionId]);
 
-  // Called after any card's upload succeeds. One upload can resolve
-  // multiple pending keys at once (ingestReferenceManual attempts every
-  // matching pending reference in the library, not just this one card's),
-  // so this re-fetches the whole list rather than optimistically removing
-  // a single card. Any task that was blocked before and isn't blocked
-  // anymore gets re-extracted immediately, sequentially — each call reads
-  // the previous one's already-saved result off disk, so awaiting in order
-  // (not Promise.all) keeps that consistent.
   async function handleReferenceUploaded() {
     const previousBlocked = new Set(missingReferences.flatMap((r) => r.taskIds));
 
