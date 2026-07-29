@@ -83,6 +83,9 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
   const [extractionStatus, setExtractionStatus] = useState<Record<string, boolean>>({});
   const [extractingSectionId, setExtractingSectionId] = useState<string | null>(null);
   const [openErrorSectionId, setOpenErrorSectionId] = useState<string | null>(null);
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     setIsLoading(true);
@@ -160,6 +163,19 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
     }
   }
 
+  async function handleConfirmDelete() {
+    setIsDeleting(true);
+    setDeleteError(null);
+    try {
+      await window.api.deleteCMM(cmm.id);
+      onBack();
+    } catch (err) {
+      console.error(`delete failed for CMM ${cmm.id}:`, err);
+      setDeleteError('Delete failed — try again.');
+      setIsDeleting(false);
+    }
+  }
+
   if (openTask) {
     return (
       <div className="cmm-card-dash">
@@ -188,7 +204,36 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
           ← Back to Library
         </button>
         <h2 className="cmm-card-dash__title">{cmm.title}</h2>
+
+        {isConfirmingDelete ? (
+          <div className="cmm-card-dash__delete-confirm">
+            <span className="cmm-card-dash__delete-confirm-text">Delete this CMM?</span>
+            <button
+              className="cmm-card-dash__delete-confirm-yes"
+              onClick={handleConfirmDelete}
+              disabled={isDeleting}
+            >
+              {isDeleting ? 'Deleting…' : 'Yes, delete'}
+            </button>
+            <button
+              className="cmm-card-dash__delete-confirm-cancel"
+              onClick={() => setIsConfirmingDelete(false)}
+              disabled={isDeleting}
+            >
+              Cancel
+            </button>
+          </div>
+        ) : (
+          <button
+            className="cmm-card-dash__delete"
+            onClick={() => setIsConfirmingDelete(true)}
+          >
+            Delete CMM
+          </button>
+        )}
       </div>
+
+      {deleteError && <p className="cmm-card-dash__delete-error">{deleteError}</p>}
 
       {isLoading ? (
         <p className="cmm-card-dash__loading">Loading...</p>

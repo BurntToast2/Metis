@@ -14,6 +14,7 @@ import { registerCleaningHandlers } from './ipc/sections/cleaning/cleaning.handl
 import { registerInspectionHandlers } from './ipc/sections/inspection/inspection.handlers';
 import { registerRepairsHandlers } from './ipc/sections/repairs/repairs.handlers';
 import { registerReferenceManualHandlers } from './ipc/referenceManuals/referenceManualHandlers';
+import { registerCmmDeletionHandlers } from '../main/ipc/cmmDeletion';
 
 if (started) {
   app.quit();
@@ -60,6 +61,7 @@ app.on('ready', () => {
   registerInspectionHandlers();
   registerRepairsHandlers();
   registerReferenceManualHandlers();
+  registerCmmDeletionHandlers();
   createWindow();
 });
 

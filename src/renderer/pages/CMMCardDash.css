@@ -247,3 +247,72 @@
   color: #5a6472;
   margin: 0;
 }
+
+.cmm-card-dash__delete {
+  margin-left: auto;
+  background: none;
+  border: 1px solid #e3c9c9;
+  color: #b3261e;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.cmm-card-dash__delete:hover {
+  background: #fdf0ee;
+}
+
+.cmm-card-dash__delete:active {
+  transform: scale(0.96);
+}
+
+.cmm-card-dash__delete-confirm {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cmm-card-dash__delete-confirm-text {
+  font-size: 13px;
+  color: #5a6472;
+}
+
+.cmm-card-dash__delete-confirm-yes {
+  background: #b3261e;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.cmm-card-dash__delete-confirm-yes:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cmm-card-dash__delete-confirm-cancel {
+  background: none;
+  border: 1px solid #e3e6ec;
+  color: #5a6472;
+  font-size: 13px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.cmm-card-dash__delete-error {
+  color: #b3261e;
+  background: #fdf0ee;
+  border: 1px solid #f3c8c2;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
