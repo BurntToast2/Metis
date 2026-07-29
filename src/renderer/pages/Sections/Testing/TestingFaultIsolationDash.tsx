@@ -84,7 +84,12 @@ export function TestingFaultIsolationDash({ cmm, section, result, onBack }: Test
       </div>
 
       {activeTab === 'tasks' && (
-        <TaskBreakdown tasks={result.tasks} onSelectTask={handleSelectTask} />
+        <TaskBreakdown
+          cmmId={cmm.id}
+          sectionId={section.sectionId}
+          tasks={result.tasks}
+          onSelectTask={handleSelectTask}
+        />
       )}
 
       {activeTab === 'detail' && selectedTask && (

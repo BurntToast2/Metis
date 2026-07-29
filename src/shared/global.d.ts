@@ -1,6 +1,8 @@
 import { CMMRecord } from './types/cmm';
 import { SectionRef, SectionExtractionResult } from './types/sections';
 import { ManualSearchResult } from './types/search';
+import { MissingReference, UploadReferenceManualParams } from './types/referenceManuals';
+import { TaskRef } from '../main/sections/common/taskReExtraction.service';
 
 export {};
 
@@ -34,6 +36,14 @@ declare global {
       extractInspectionTools: (ref: SectionRef) => Promise<SectionExtractionResult>;
       extractRepairsTools: (ref: SectionRef) => Promise<SectionExtractionResult>;
       searchManuals: (query: string) => Promise<ManualSearchResult[]>;
+      uploadReferenceManual: (
+        params: UploadReferenceManualParams,
+      ) => Promise<{ id: number }>;
+      getMissingReferences: (args: {
+        cmmId: number;
+        sectionId: string;
+      }) => Promise<MissingReference[]>;
+      reExtractTask: (ref: TaskRef) => Promise<SectionExtractionResult>;
     };
   }
 }

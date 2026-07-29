@@ -19,6 +19,8 @@ import {
   getCmmPdfPath,
   getCmmCoverPath,
 } from '../storage/CMMPaths';
+import { pageClassificationsToRanges } from '../common/pageClassification';
+import type { PageClassification } from '../common/pageClassification';
 
 const KNOWN_SECTION_IDS = [
   'introduction',
@@ -46,17 +48,10 @@ interface CmmMetadata {
   revision: string | null;
   revisionDate: string | null;
   summary: string;
-}
-
-interface SectionRange {
-  sectionId: string;
-  startPage: number;
-  endPage: number;
-}
-
-interface PageClassification {
-  page: number;
-  sectionId: string;
+  // Aircraft applicability, e.g. "737-800". Used later to disambiguate
+  // platform-scoped external references (SRM/AMM/NTM) that reuse the same
+  // ATA chapter numbers across different aircraft types.
+  platform: string | null;
 }
 
 function buildMetadataPrompt(pages: PageText[]): {
@@ -74,7 +69,11 @@ Return ONLY a JSON object with this exact shape, no other text:
   "manufacturer": string|null,
   "revision": string|null,   // raw revision number only, e.g. "12".
   "revisionDate": string|null, // strict ISO 8601: YYYY-MM-DD. null if not found.
-  "summary": string          // EXACTLY 40 words or fewer, plain English.
+  "summary": string,         // EXACTLY 40 words or fewer, plain English.
+  "platform": string|null    // aircraft type/model this component is applicable to, if stated
+                              // (e.g. "737-800", "A320-200"). Raw as printed, no manufacturer
+                              // prefix. null if the front matter doesn't state applicability —
+                              // do not guess from the manufacturer or component type.
 }`;
   const userPrompt = pages.map((p) => `[Page ${p.page}]\n${p.text}`).join('\n\n');
   return { systemPrompt, userPrompt };
@@ -116,27 +115,6 @@ Return ONLY valid JSON in this exact shape, no other text, with exactly one entr
   return { systemPrompt, userPrompt };
 }
 
-/**
- * Collapses per-page classifications into contiguous section ranges.
- * Driven entirely by the LLM's page-by-page judgment, not by any table's
- * printed page labels or row order.
- */
-function pageClassificationsToRanges(classifications: PageClassification[]): SectionRange[] {
-  const ranges: SectionRange[] = [];
-
-  for (const { page, sectionId } of classifications) {
-    if (sectionId === FALLBACK_SECTION_ID) continue;
-    const last = ranges[ranges.length - 1];
-    if (last && last.sectionId === sectionId && page === last.endPage + 1) {
-      last.endPage = page;
-    } else {
-      ranges.push({ sectionId, startPage: page, endPage: page });
-    }
-  }
-
-  return ranges;
-}
-
 export async function processNewCmm(
   uploadedFilePath: string,
   _selectedSectionIds: string[],
@@ -152,7 +130,7 @@ export async function processNewCmm(
     maxTokens: Math.max(8000, totalPages * 20),
   });
 
-  const sectionRanges = pageClassificationsToRanges(classifications);
+  const sectionRanges = pageClassificationsToRanges(classifications, FALLBACK_SECTION_ID);
 
   const introRange = sectionRanges.find((r) => r.sectionId === 'introduction');
   const frontMatterEndPage = introRange ? introRange.endPage : Math.min(20, totalPages);
@@ -171,6 +149,7 @@ export async function processNewCmm(
       manufacturer: metadata.manufacturer,
       revision: metadata.revision,
       revisionDate: metadata.revisionDate ? new Date(metadata.revisionDate) : null,
+      platform: metadata.platform,
       filePath: '',
     })
     .returning();

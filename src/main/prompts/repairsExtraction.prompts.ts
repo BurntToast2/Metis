@@ -1,3 +1,7 @@
+import {
+  EXTERNAL_REFERENCE_EXTRACTION_INSTRUCTIONS,
+  EXTERNAL_REFERENCE_JSON_EXAMPLE,
+} from './common/externalReferenceInstructions';
 export function buildRepairsReferenceFinderSystemPrompt(validSectionIds: string[]): string {
   return [
     'You are an aircraft component maintenance manual (CMM) analyst.',
@@ -97,6 +101,8 @@ export function buildRepairsTaskExtractionSystemPrompt(): string {
     '- Same non-deduplication rule as tools: a consumable table printed under this task belongs to this task;',
     '  a consumable reused by this task belongs to this task too, even if first named elsewhere.',
     '',
+    EXTERNAL_REFERENCE_EXTRACTION_INSTRUCTIONS,
+    '',
     'Respond ONLY with strict json in the following shape, with no extra commentary:',
     '',
     'EXAMPLE JSON OUTPUT:',
@@ -127,12 +133,14 @@ export function buildRepairsTaskExtractionSystemPrompt(): string {
     '          "spec": "BMS 8-256",',
     '          "category": "Sealant"',
     '        }',
-    '      ]',
+    '      ],',
+    EXTERNAL_REFERENCE_JSON_EXAMPLE,
     '    }',
     '  ]',
     '}',
     '',
-    'If a task has no sub-tasks, tools, or consumables, return empty arrays rather than omitting the fields.',
+    'If a task has no sub-tasks, tools, consumables, or external references, return empty arrays',
+    'rather than omitting the fields.',
   ].join('\n');
 }
 

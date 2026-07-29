@@ -85,7 +85,12 @@ export function CleaningDash({ cmm, section, result, onBack }: CleaningDashProps
       </div>
 
       {activeTab === 'tasks' && (
-        <TaskBreakdown tasks={result.tasks} onSelectTask={handleSelectTask} />
+        <TaskBreakdown
+          cmmId={cmm.id}
+          sectionId={section.sectionId}
+          tasks={result.tasks}
+          onSelectTask={handleSelectTask}
+        />
       )}
 
       {activeTab === 'detail' && selectedTask && (

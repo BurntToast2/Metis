@@ -13,6 +13,7 @@ import { registerSearchHandlers } from './ipc/search.handlers';
 import { registerCleaningHandlers } from './ipc/sections/cleaning/cleaning.handlers';
 import { registerInspectionHandlers } from './ipc/sections/inspection/inspection.handlers';
 import { registerRepairsHandlers } from './ipc/sections/repairs/repairs.handlers';
+import { registerReferenceManualHandlers } from './ipc/referenceManuals/referenceManualHandlers';
 
 if (started) {
   app.quit();
@@ -58,6 +59,7 @@ app.on('ready', () => {
   registerCleaningHandlers();
   registerInspectionHandlers();
   registerRepairsHandlers();
+  registerReferenceManualHandlers();
   createWindow();
 });
 

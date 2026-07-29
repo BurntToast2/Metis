@@ -1,0 +1,63 @@
+import { useState } from 'react';
+import type { ChangeEvent } from 'react';
+import { MissingReference } from '../../../../shared/types/referenceManuals';
+
+interface MissingReferenceCardProps {
+  reference: MissingReference;
+  onUploaded: () => void;
+}
+
+export function MissingReferenceCard({ reference, onUploaded }: MissingReferenceCardProps) {
+  const [isUploading, setIsUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    setError(null);
+    try {
+      const filePath = window.api.getPathForFile(file);
+      await window.api.uploadReferenceManual({
+        filePath,
+        manualType: reference.manualType,
+        // Reused exactly as stored — never re-derived here, so the
+        // uploaded manual's platform matches this citation's key.
+        platform: reference.platform,
+      });
+      onUploaded();
+    } catch (err) {
+      console.error(`upload failed for reference "${reference.key}":`, err);
+      setError('Upload failed — try again.');
+    } finally {
+      setIsUploading(false);
+      e.target.value = '';
+    }
+  }
+
+  return (
+    <div className="missing-reference-card">
+      <div className="missing-reference-card__info">
+        <p className="missing-reference-card__manual">
+          {reference.manualType} {reference.rawDocNumber}
+        </p>
+        <p className="missing-reference-card__tasks">
+          Needed by {reference.taskIds.length} task{reference.taskIds.length === 1 ? '' : 's'}
+        </p>
+        {error && <p className="missing-reference-card__error">{error}</p>}
+      </div>
+
+      <label className="missing-reference-card__upload">
+        {isUploading ? 'Uploading…' : 'Upload'}
+        <input
+          type="file"
+          accept=".pdf"
+          onChange={handleFileChange}
+          disabled={isUploading}
+          className="missing-reference-card__input"
+        />
+      </label>
+    </div>
+  );
+}

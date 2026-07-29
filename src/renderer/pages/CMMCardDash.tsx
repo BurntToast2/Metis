@@ -51,11 +51,6 @@ function sectionLabel(sectionId: string): string {
     .join(' ');
 }
 
-// Dash components now receive the already-fetched result directly — they no
-// longer call the extractor themselves. This avoids a redundant IPC round
-// trip (and the accompanying plain-spinner flash) immediately after
-// CMMCardDash has just fetched the same result to decide whether to open
-// the section at all.
 function renderSectionDash(
   cmm: CMMRecord,
   { section, result }: OpenTask,
@@ -141,10 +136,6 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
 
     setOpenErrorSectionId(null);
 
-    // Already extracted (from this session or a previous one) — no
-    // "extracting" card animation needed, but we still need the actual
-    // result in hand before opening the dash, since it's a cache hit on
-    // disk rather than something already sitting in this component's state.
     if (extractionStatus[section.sectionId]) {
       try {
         const result = await extractor({ cmmId: cmm.id, sectionId: section.sectionId });
@@ -254,6 +245,17 @@ export function CMMCardDash({ cmm, onBack }: CMMCardDashProps) {
                   <div className="cmm-card-dash__summary-row">
                     <dt>Revision</dt>
                     <dd>{cmm.revision}</dd>
+                  </div>
+                )}
+                {cmm.platform ? (
+                  <div className="cmm-card-dash__summary-row">
+                    <dt>Platform</dt>
+                    <dd>{cmm.platform}</dd>
+                  </div>
+                ) : (
+                  <div className="cmm-card-dash__summary-row cmm-card-dash__summary-row--missing">
+                    <dt>Platform</dt>
+                    <dd>Not detected</dd>
                   </div>
                 )}
               </dl>

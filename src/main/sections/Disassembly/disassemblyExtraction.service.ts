@@ -11,6 +11,7 @@ import {
 import type { SectionRef, SectionExtractionResult } from '../common/section.types';
 import { loadCmmTextIndex, getSectionContent } from '../../storage/CMMSectionContent';
 import { getCmmExtractedSectionPath } from '../../storage/CMMPaths';
+import { registerTaskReferences } from '../common/registerTaskReferences';
 
 async function readExistingResult(
   cmmId: number,
@@ -101,6 +102,10 @@ export async function runDisassemblyExtraction({
   };
 
   await saveExtractionResult(result);
+
+  for (const task of tasks) {
+    await registerTaskReferences(cmmId, sectionId, task);
+  }
 
   return result;
 }
