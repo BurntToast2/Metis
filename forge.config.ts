@@ -10,6 +10,14 @@ import { FuseV1Options, FuseVersion } from '@electron/fuses';
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
+    ignore: [
+      /^\/src/,
+      /^\/\.vite\.(main|preload|renderer)\.config\.(ts|js)$/,
+      /^\/tsconfig\.json$/,
+      /^\/forge\.config\.ts$/,
+      /^\/\.eslintrc/,
+      /^\/\.gitignore$/,
+    ],
   },
   rebuildConfig: {},
   makers: [

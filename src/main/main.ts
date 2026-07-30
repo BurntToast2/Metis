@@ -15,6 +15,13 @@ import { registerInspectionHandlers } from './ipc/sections/inspection/inspection
 import { registerRepairsHandlers } from './ipc/sections/repairs/repairs.handlers';
 import { registerReferenceManualHandlers } from './ipc/referenceManuals/referenceManualHandlers';
 import { registerCmmDeletionHandlers } from '../main/ipc/cmmDeletion';
+import dotenv from 'dotenv';
+
+dotenv.config({
+  path: app.isPackaged
+    ? path.join(app.getPath('userData'), '.env')
+    : path.join(__dirname, '../../.env'),
+});
 
 if (started) {
   app.quit();
