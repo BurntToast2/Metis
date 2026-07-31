@@ -1,8 +1,3 @@
-/**
- * The fallback matcher, reached only when deterministic prefix matching
- * finds nothing. Sees a compact list of {sectionId, snippet} — never full
- * section text — so cost stays flat regardless of how long the manual is.
- */
 export function buildSectionResolutionPrompt(
   citation: { manualType: string; rawDocNumber: string },
   candidateSections: { sectionId: string; snippet: string }[],

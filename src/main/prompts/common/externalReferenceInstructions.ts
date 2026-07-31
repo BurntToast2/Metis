@@ -1,10 +1,3 @@
-/**
- * Shared instruction block appended to every section's task-extraction
- * system prompt (testing, cleaning, inspection, repairs). Kept in one
- * place so the extraction rules for external-manual citations can't drift
- * between sections — only the surrounding section-specific prompt text
- * differs.
- */
 export const EXTERNAL_REFERENCE_EXTRACTION_INSTRUCTIONS = [
   'EXTERNAL MANUAL REFERENCES — for every task, also capture any reference to a DIFFERENT manual',
   '(not a top-level section of THIS document) that the task or its procedure cites — e.g.',
@@ -20,10 +13,7 @@ export const EXTERNAL_REFERENCE_EXTRACTION_INSTRUCTIONS = [
   'separately and are not external references.',
 ].join('\n');
 
-/**
- * The JSON shape fragment for a single external reference entry, for
- * inclusion in each section's example JSON output block.
- */
+
 export const EXTERNAL_REFERENCE_JSON_EXAMPLE = [
   '      "externalReferences": [',
   '        { "manualType": "SRM", "rawDocNumber": "53-30-01", "reason": "Repair limits for bonded doubler" }',

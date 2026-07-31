@@ -1,5 +1,3 @@
-/* Manual View (PDF embed) */
-
 .manual-view {
   overflow: auto;
   min-width: 320px;
@@ -18,7 +16,6 @@
 }
 
 /* Task Breakdown (search + card grid) */
-
 .task-breakdown__search {
   width: 100%;
   max-width: 400px;
@@ -47,7 +44,6 @@
 }
 
 /* Task Card */
-
 .task-card {
   background: #ffffff;
   border: 1px solid #e3e6ec;
@@ -88,7 +84,6 @@
 }
 
 /* Task Detail */
-
 .task-detail {
   display: flex;
   flex-direction: column;
@@ -142,7 +137,6 @@
 }
 
 /* Missing References */
-
 .task-breakdown__missing-refs {
   margin-top: 32px;
   padding-top: 20px;

@@ -1,3 +1,12 @@
+import './env';   
+import dotenv from 'dotenv';
+import { db } from './db';
+dotenv.config({
+  path: app.isPackaged
+    ? path.join(app.getPath('userData'), '.env')
+    : path.join(__dirname, '../../.env'),
+});
+
 import 'dotenv/config';
 import { app, BrowserWindow } from 'electron';
 import path from 'node:path';
@@ -15,13 +24,8 @@ import { registerInspectionHandlers } from './ipc/sections/inspection/inspection
 import { registerRepairsHandlers } from './ipc/sections/repairs/repairs.handlers';
 import { registerReferenceManualHandlers } from './ipc/referenceManuals/referenceManualHandlers';
 import { registerCmmDeletionHandlers } from '../main/ipc/cmmDeletion';
-import dotenv from 'dotenv';
 
-dotenv.config({
-  path: app.isPackaged
-    ? path.join(app.getPath('userData'), '.env')
-    : path.join(__dirname, '../../.env'),
-});
+
 
 if (started) {
   app.quit();
