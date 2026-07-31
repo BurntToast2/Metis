@@ -71,6 +71,11 @@ export const taskReferenceLinks = pgTable(
     externalReferenceId: integer('external_reference_id')
       .notNull()
       .references(() => externalReferences.id),
+    // The CMM page the citation itself was found on — not the task's own
+    // sourcePage, since a task can span many pages and the citation may
+    // sit anywhere within it. Nullable only for defensive/legacy rows;
+    // every new registration always supplies it.
+    sourcePage: integer('source_page'),
   },
   (table) => ({
     taskRefIdx: uniqueIndex('task_reference_links_unique_idx').on(

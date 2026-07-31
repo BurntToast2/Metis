@@ -6,6 +6,7 @@ export interface MissingReference {
   rawDocNumber: string;
   platform: string | null;
   taskIds: string[];
+  sourcePages: number[]; // one per taskId, same index order
 }
 
 export interface UploadReferenceManualParams {

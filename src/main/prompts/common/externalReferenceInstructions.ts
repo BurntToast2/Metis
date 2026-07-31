@@ -8,14 +8,22 @@ export const EXTERNAL_REFERENCE_EXTRACTION_INSTRUCTIONS = [
   '- rawDocNumber: the chapter/document number or heading EXACTLY as printed in the source text —',
   '  do not normalize punctuation, do not guess a number that is not actually written.',
   '- reason: a short note on what the task needs from it (e.g. "Repair limits for bonded doubler").',
+  '- sourcePage: the page number from the nearest preceding "--- PAGE <number> ---" marker above',
+  '  WHERE THIS SPECIFIC CITATION ITSELF is printed — not the task\'s own overall sourcePage. A task',
+  '  spanning several pages may cite different external manuals on different pages within it; report',
+  '  the exact page each individual citation appears on.',
   '',
   'Do NOT report this for references to sections WITHIN this same document — those are handled',
   'separately and are not external references.',
 ].join('\n');
 
-
 export const EXTERNAL_REFERENCE_JSON_EXAMPLE = [
   '      "externalReferences": [',
-  '        { "manualType": "SRM", "rawDocNumber": "53-30-01", "reason": "Repair limits for bonded doubler" }',
+  '        {',
+  '          "manualType": "SRM",',
+  '          "rawDocNumber": "53-30-01",',
+  '          "reason": "Repair limits for bonded doubler",',
+  '          "sourcePage": 77',
+  '        }',
   '      ]',
 ].join('\n');

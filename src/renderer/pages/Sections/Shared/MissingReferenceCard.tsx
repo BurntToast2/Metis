@@ -34,15 +34,26 @@ export function MissingReferenceCard({ reference, onUploaded }: MissingReference
     }
   }
 
+  // taskIds and sourcePages are parallel arrays (same index = same
+  // citation) — zip them for display rather than showing a bare count.
+  const citations = reference.taskIds.map((taskId, i) => ({
+    taskId,
+    page: reference.sourcePages[i],
+  }));
+
   return (
     <div className="missing-reference-card">
       <div className="missing-reference-card__info">
         <p className="missing-reference-card__manual">
           {reference.manualType} {reference.rawDocNumber}
         </p>
-        <p className="missing-reference-card__tasks">
-          Needed by {reference.taskIds.length} task{reference.taskIds.length === 1 ? '' : 's'}
-        </p>
+        <ul className="missing-reference-card__citations">
+          {citations.map(({ taskId, page }) => (
+            <li key={taskId} className="missing-reference-card__citation">
+              Task {taskId}{page ? `, p. ${page}` : ''}
+            </li>
+          ))}
+        </ul>
         {error && <p className="missing-reference-card__error">{error}</p>}
       </div>
 

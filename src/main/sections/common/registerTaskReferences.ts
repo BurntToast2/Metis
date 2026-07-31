@@ -27,7 +27,7 @@ async function findOrCreateExternalReference(
   const [inserted] = await db
     .insert(externalReferences)
     .values({
-      manualType: manualType as never, 
+      manualType: manualType as never,
       platform,
       rawDocNumber,
       normalizedKey,
@@ -52,10 +52,17 @@ async function linkTaskToReference(
   sectionId: string,
   taskId: string,
   externalReferenceId: number,
+  sourcePage: number,
 ): Promise<void> {
+  // onConflictDoNothing means if this exact (cmm, section, task,
+  // reference) combination already exists — e.g. from a prior extraction
+  // run — its stored sourcePage is left untouched, even if this call
+  // supplies a different one. Re-running a section's extraction and
+  // getting a different page for the same citation won't self-correct
+  // without deleting the old link first.
   await db
     .insert(taskReferenceLinks)
-    .values({ cmmId, sectionId, taskId, externalReferenceId })
+    .values({ cmmId, sectionId, taskId, externalReferenceId, sourcePage })
     .onConflictDoNothing({
       target: [
         taskReferenceLinks.cmmId,
@@ -65,7 +72,6 @@ async function linkTaskToReference(
       ],
     });
 }
-
 
 export async function registerTaskReferences(
   cmmId: number,
@@ -90,7 +96,7 @@ export async function registerTaskReferences(
         ref.rawDocNumber,
       );
 
-      await linkTaskToReference(cmmId, sectionId, task.id, externalReferenceId);
+      await linkTaskToReference(cmmId, sectionId, task.id, externalReferenceId, ref.sourcePage);
 
       if (wasCreated) {
         await tryResolveAgainstExistingManuals(externalReferenceId);

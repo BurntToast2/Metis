@@ -32,6 +32,10 @@ export interface ExternalReference {
   manualType: ExternalManualType;
   rawDocNumber: string;
   reason?: string;
+  // The page (within THIS document) where the citation itself appears —
+  // e.g. if a task spans pages 74-79 but cites an SRM chapter specifically
+  // on page 77, this is 77, not the task's own sourcePage.
+  sourcePage: number;
 }
 
 export interface Task {

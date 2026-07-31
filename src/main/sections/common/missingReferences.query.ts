@@ -14,6 +14,7 @@ export async function getMissingReferencesForSection(
       rawDocNumber: externalReferences.rawDocNumber,
       platform: externalReferences.platform,
       taskId: taskReferenceLinks.taskId,
+      sourcePage: taskReferenceLinks.sourcePage,
     })
     .from(taskReferenceLinks)
     .innerJoin(externalReferences, eq(taskReferenceLinks.externalReferenceId, externalReferences.id))
@@ -30,6 +31,7 @@ export async function getMissingReferencesForSection(
     const existing = byKey.get(row.key);
     if (existing) {
       existing.taskIds.push(row.taskId);
+      existing.sourcePages.push(row.sourcePage ?? 0);
     } else {
       byKey.set(row.key, {
         key: row.key,
@@ -37,6 +39,7 @@ export async function getMissingReferencesForSection(
         rawDocNumber: row.rawDocNumber,
         platform: row.platform,
         taskIds: [row.taskId],
+        sourcePages: [row.sourcePage ?? 0],
       });
     }
   }
