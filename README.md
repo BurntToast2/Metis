@@ -2,7 +2,9 @@
 
 Metis is a desktop application for managing and extracting structured data from Component Maintenance Manuals (CMMs) used in aircraft maintenance. It combines a searchable CMM library with LLM-assisted extraction of key sections — turning long, unstructured PDF manuals into navigable, task-level data.
 
-<img width="2560" height="1488" alt="Main Menu" src="https://github.com/user-attachments/assets/dd4f34f8-b592-40ef-a650-b3db78ed746c" />
+<p align="center">
+  <img width="700" height="407" alt="Main Menu" src="https://github.com/user-attachments/assets/dd4f34f8-b592-40ef-a650-b3db78ed746c" />
+</p>
 
 ## Overview
 
@@ -30,15 +32,21 @@ Card-based library view with dynamic column layout. Each card displays the manua
 
 Upload a new manual via drag-and-drop:
 
-<img width="2560" height="1486" alt="Upload Cmm" src="https://github.com/user-attachments/assets/950680e4-790c-4de9-be7b-fc1ee6f9984b" />
+<p align="center">
+  <img width="700" height="406" alt="Upload Cmm" src="https://github.com/user-attachments/assets/950680e4-790c-4de9-be7b-fc1ee6f9984b" />
+</p>
 
 Metis then parses the manual and extracts its structure automatically:
 
-<img width="2560" height="1489" alt="Extracting" src="https://github.com/user-attachments/assets/914d36e9-4c6f-4dde-aabc-77c44d8f39c6" />
+<p align="center">
+  <img width="700" height="407" alt="Extracting" src="https://github.com/user-attachments/assets/914d36e9-4c6f-4dde-aabc-77c44d8f39c6" />
+</p>
 
-Once processed, each CMM gets a detail view with an auto-generated summary and a breakdown of every parsed section:
+Once processed, each CMM gets a detailed view with an auto-generated summary and a breakdown of every parsed section:
 
-<img width="2560" height="1485" alt="CMM" src="https://github.com/user-attachments/assets/df8ce671-01da-4bc3-8dae-99d4d30097c1" />
+<p align="center">
+  <img width="700" height="406" alt="CMM" src="https://github.com/user-attachments/assets/df8ce671-01da-4bc3-8dae-99d4d30097c1" />
+</p>
 
 ### Section Extraction
 
@@ -57,11 +65,15 @@ Extraction identifies section boundaries using the manual's own LOEP rather than
 
 For sections like Repairs and Testing & Fault Isolation, extraction produces a searchable task breakdown:
 
-<img width="2560" height="1600" alt="Tasks" src="https://github.com/user-attachments/assets/f6a7ea73-eefd-4832-83e9-945d4752df26" />
+<p align="center">
+  <img width="700" height="408" alt="Tasks" src="https://github.com/user-attachments/assets/f2c325f9-05f9-474f-a070-1c2f02175065" />
+</p>
 
 Clicking into a task shows its sub-tasks alongside per-task tool and consumable tables:
 
-<img width="2560" height="1491" alt="Task Info" src="https://github.com/user-attachments/assets/3637a3e9-574a-436d-a450-03ea7e540069" />
+<p align="center">
+  <img width="700" height="408" alt="Task Info" src="https://github.com/user-attachments/assets/3637a3e9-574a-436d-a450-03ea7e540069" />
+</p>
 
 - Task cards (task number, page reference, sub-tasks)
 - Per-task tool and consumable tables, editable inline
@@ -71,7 +83,9 @@ Clicking into a task shows its sub-tasks alongside per-task tool and consumable 
 
 Metis detects when a CMM references another document (SRM sections, other CFMI standard practices manuals, AMM tasks, MIL/ASTM specs, etc.), flags each missing reference against the task that needs it, and lets the user upload the source so it can be merged into the combined output:
 
-<img width="2560" height="1486" alt="References" src="https://github.com/user-attachments/assets/b602e0e4-83bc-4608-a748-62ca2614b463" />
+<p align="center">
+  <img width="700" height="406" alt="References" src="https://github.com/user-attachments/assets/b602e0e4-83bc-4608-a748-62ca2614b463" />
+</p>
 
 ## Data & Trust Model
 
