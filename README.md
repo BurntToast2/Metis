@@ -62,12 +62,25 @@ Metis is under active development. Current focus areas include:
 
 ## Getting Started
 
+### 1. Environment Setup
+
+Create a `.env` file in the project root:
+
+```dotenv
+DATABASE_URL=postgresql://postgres:<password>@localhost:5432/demo_dev
+DEEPSEEK_API_KEY=<API Key>
+```
+
+- `DATABASE_URL` — connection string for your local PostgreSQL instance (database: `demo_dev`)
+- `DEEPSEEK_API_KEY` — API key used for CMM extraction
+
+### 2. Install & Run
+
 ```bash
 npm install
 npm run start
 ```
 
-Requires a local PostgreSQL instance (database: `demo_dev`) configured per `drizzle.config.ts`.
-
 ## License
-MIT
+
+TBD
