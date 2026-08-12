@@ -50,7 +50,7 @@ Once processed, each CMM gets a detailed view with an auto-generated summary and
 
 ### Section Extraction
 
-The following CMM sections are supported for structured extraction:
+The following CMM sections are supported (currently) for structured extraction:
 
 - CMM Revisions
 - Description & Operation
@@ -98,7 +98,7 @@ Metis detects when a CMM references another document (SRM sections, other CFMI s
 Metis is under active development. Current focus areas include:
 
 - Expanding section coverage beyond the currently supported set
-- The data & trust model is still under development
+- The data & trust model for verification
 
 ## Getting Started
 
