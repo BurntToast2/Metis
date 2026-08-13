@@ -121,6 +121,4 @@ npm install
 npm run start
 ```
 
-## License
 
-TBD
