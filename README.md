@@ -99,6 +99,7 @@ Metis is under active development. Current focus areas include:
 
 - Expanding section coverage beyond the currently supported set
 - The data & trust model for verification
+- There is a lot of repetitive code under the sections, which will be tailored later as the user needs
 
 ## Getting Started
 
